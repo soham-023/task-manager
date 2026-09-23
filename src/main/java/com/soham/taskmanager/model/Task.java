@@ -3,11 +3,12 @@ package com.soham.taskmanager.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * JPA Entity representing a Task.
- * Each task has a title, optional description, priority level, and completion status.
+ * Each task has a title, optional description, priority level, completion status, and optional due date.
  */
 @Entity
 @Table(name = "tasks")
@@ -48,6 +49,9 @@ public class Task {
     @Column(nullable = false)
     private Status status = Status.TODO;
 
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -77,10 +81,15 @@ public class Task {
     }
 
     public Task(String title, String description, Priority priority, Status status) {
+        this(title, description, priority, status, null);
+    }
+
+    public Task(String title, String description, Priority priority, Status status, LocalDate dueDate) {
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.status = status;
+        this.dueDate = dueDate;
     }
 
     // --- Getters and Setters ---
@@ -141,6 +150,14 @@ public class Task {
         this.updatedAt = updatedAt;
     }
 
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -148,6 +165,7 @@ public class Task {
                 ", title='" + title + '\'' +
                 ", priority=" + priority +
                 ", status=" + status +
+                ", dueDate=" + dueDate +
                 '}';
     }
 }

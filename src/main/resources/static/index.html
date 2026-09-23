@@ -54,6 +54,10 @@
             <span class="stat-count done" id="stat-done">0</span>
             <span class="stat-label">Done</span>
         </div>
+        <div class="stat">
+            <span class="stat-count overdue" id="stat-overdue">0</span>
+            <span class="stat-label">Overdue</span>
+        </div>
     </section>
 
     <!-- Task List -->
@@ -103,6 +107,10 @@
                             <option value="DONE">Done</option>
                         </select>
                     </div>
+                </div>
+                <div class="form-group">
+                    <label for="input-due-date">Due Date</label>
+                    <input type="date" id="input-due-date" />
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="btn-cancel">Cancel</button>

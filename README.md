@@ -7,13 +7,14 @@ A clean, modern, and well-structured task management application built with **Sp
 ## 🚀 Features
 
 - **Full CRUD Operations**: Create, read, update, and delete tasks.
+- **Due Dates & Overdue Alerts**: Set task deadlines with automatic badges (`🚨 Overdue`, `⏳ Due Today`, `📅 Due: Date`) and overdue dashboard counters.
 - **Quick Status Toggle**: Mark tasks as completed or reopen them with a single click.
 - **Live Search & Filters**: Search tasks by title and filter by status (`TODO`, `IN_PROGRESS`, `DONE`) and priority (`LOW`, `MEDIUM`, `HIGH`).
-- **Real-time Statistics**: Dashboard metrics tracking total, to-do, in-progress, and completed tasks.
+- **Real-time Statistics**: Dashboard metrics tracking total, to-do, in-progress, completed, and overdue tasks.
 - **Clean Layered Architecture**: Controller → Service → Repository → Model with DTO validation and centralized error handling.
 - **Embedded Database**: H2 in-memory SQL database with web console enabled for easy inspection.
 - **Responsive UI**: Pure CSS (no heavy framework dependencies), modern cards, modal dialogs, and toast notifications.
-- **Comprehensive Automated Tests**: 13 Spring Boot integration tests verifying all REST endpoints and edge cases.
+- **Comprehensive Automated Tests**: 14 Spring Boot integration tests verifying all REST endpoints and edge cases.
 
 ---
 

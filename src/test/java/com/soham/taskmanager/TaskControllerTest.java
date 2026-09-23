@@ -5,6 +5,7 @@ import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -149,10 +150,24 @@ class TaskControllerTest {
     // ==========================================
 
     @Test
+    void createTask_withDueDate_returnsCreatedTaskWithDueDate() throws Exception {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        Task newTask = new Task("Task with Due Date", "Details", Task.Priority.HIGH, Task.Status.TODO, tomorrow);
+
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTask)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.dueDate", is(tomorrow.toString())));
+    }
+
+    @Test
     void updateTask_updatesAndReturnsTask() throws Exception {
         Task task = createSampleTask("Old Title", Task.Priority.LOW, Task.Status.TODO);
 
-        Task updated = new Task("Updated Title", "Updated desc", Task.Priority.HIGH, Task.Status.IN_PROGRESS);
+        LocalDate nextWeek = LocalDate.now().plusWeeks(1);
+        Task updated = new Task("Updated Title", "Updated desc", Task.Priority.HIGH, Task.Status.IN_PROGRESS, nextWeek);
 
         mockMvc.perform(put("/api/tasks/" + task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -160,7 +175,8 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("Updated Title")))
                 .andExpect(jsonPath("$.priority", is("HIGH")))
-                .andExpect(jsonPath("$.status", is("IN_PROGRESS")));
+                .andExpect(jsonPath("$.status", is("IN_PROGRESS")))
+                .andExpect(jsonPath("$.dueDate", is(nextWeek.toString())));
     }
 
     // ==========================================

@@ -22,6 +22,7 @@ const inputTitle = document.getElementById('input-title');
 const inputDescription = document.getElementById('input-description');
 const inputPriority = document.getElementById('input-priority');
 const inputStatus = document.getElementById('input-status');
+const inputDueDate = document.getElementById('input-due-date');
 const titleChars = document.getElementById('title-chars');
 const descChars = document.getElementById('desc-chars');
 
@@ -30,6 +31,7 @@ const statTotal = document.getElementById('stat-total');
 const statTodo = document.getElementById('stat-todo');
 const statInProgress = document.getElementById('stat-in-progress');
 const statDone = document.getElementById('stat-done');
+const statOverdue = document.getElementById('stat-overdue');
 
 // State
 let editingTaskId = null;
@@ -96,6 +98,39 @@ async function updateTaskStatus(id, status) {
 // Rendering
 // ==========================================
 
+function getDueDateBadge(dueDateStr, status) {
+    if (!dueDateStr) return '';
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [year, month, day] = dueDateStr.split('-').map(Number);
+    const dueDate = new Date(year, month - 1, day);
+    dueDate.setHours(0, 0, 0, 0);
+
+    const formatted = dueDate.toLocaleDateString('en-IN', {
+        day: 'numeric', month: 'short', year: 'numeric'
+    });
+
+    if (status === 'DONE') {
+        return `<span class="badge badge-due">📅 Due: ${formatted}</span>`;
+    }
+
+    const diffTime = dueDate.getTime() - today.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+        const daysAgo = Math.abs(diffDays);
+        return `<span class="badge badge-overdue">🚨 Overdue (${daysAgo}d ago)</span>`;
+    } else if (diffDays === 0) {
+        return `<span class="badge badge-due-today">⏳ Due Today</span>`;
+    } else if (diffDays === 1) {
+        return `<span class="badge badge-due">⏰ Due Tomorrow</span>`;
+    } else {
+        return `<span class="badge badge-due">📅 Due: ${formatted}</span>`;
+    }
+}
+
 function renderTasks(tasks) {
     taskListEl.innerHTML = '';
 
@@ -128,7 +163,8 @@ function renderTasks(tasks) {
                 <div class="task-meta">
                     <span class="badge badge-priority-${task.priority}">${task.priority}</span>
                     <span class="badge badge-status-${task.status}">${formatStatus(task.status)}</span>
-                    <span class="task-date">${createdDate}</span>
+                    ${getDueDateBadge(task.dueDate, task.status)}
+                    <span class="task-date">Created: ${createdDate}</span>
                 </div>
             </div>
             <div class="task-actions">
@@ -170,10 +206,22 @@ function renderTasks(tasks) {
 }
 
 function updateStats(tasks) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const overdueCount = tasks.filter(t => {
+        if (t.status === 'DONE' || !t.dueDate) return false;
+        const [y, m, d] = t.dueDate.split('-').map(Number);
+        const due = new Date(y, m - 1, d);
+        due.setHours(0, 0, 0, 0);
+        return due < today;
+    }).length;
+
     statTotal.textContent = tasks.length;
     statTodo.textContent = tasks.filter(t => t.status === 'TODO').length;
     statInProgress.textContent = tasks.filter(t => t.status === 'IN_PROGRESS').length;
     statDone.textContent = tasks.filter(t => t.status === 'DONE').length;
+    statOverdue.textContent = overdueCount;
 }
 
 // ==========================================
@@ -212,6 +260,7 @@ function openNewModal() {
     taskForm.reset();
     inputPriority.value = 'MEDIUM';
     inputStatus.value = 'TODO';
+    inputDueDate.value = '';
     titleChars.textContent = '0';
     descChars.textContent = '0';
     document.getElementById('btn-save').textContent = 'Save Task';
@@ -226,6 +275,7 @@ function openEditModal(task) {
     inputDescription.value = task.description || '';
     inputPriority.value = task.priority;
     inputStatus.value = task.status;
+    inputDueDate.value = task.dueDate || '';
     titleChars.textContent = task.title.length;
     descChars.textContent = (task.description || '').length;
     document.getElementById('btn-save').textContent = 'Update Task';
@@ -300,6 +350,7 @@ taskForm.addEventListener('submit', async (e) => {
         description: inputDescription.value.trim() || null,
         priority: inputPriority.value,
         status: inputStatus.value,
+        dueDate: inputDueDate.value || null,
     };
 
     if (!task.title) {
