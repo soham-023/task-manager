@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Main entry point for the Task Manager application.
  * Starts the embedded Tomcat server and serves both the REST API and static frontend.
  */
+
 @SpringBootApplication
 public class TaskManagerApplication {
 
