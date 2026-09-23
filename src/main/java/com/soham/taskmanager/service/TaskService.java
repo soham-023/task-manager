@@ -85,6 +85,7 @@ public class TaskService {
         Task existing = getTaskById(id);
         existing.setStatus(status);
         return taskRepository.save(existing);
+        
     }
 
     /**
