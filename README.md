@@ -25,6 +25,7 @@ A clean, modern, and well-structured task management application built with **Sp
 - **Frontend**: HTML5, Modern CSS3 (Grid & Flexbox), Vanilla JavaScript (ES6+ Fetch API)
 - **Build Tool**: Apache Maven
 - **Testing**: Spring Boot Test, MockMvc, JUnit 5, Hamcrest
+  
 
 ---
 
