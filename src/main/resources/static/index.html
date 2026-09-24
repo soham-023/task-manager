@@ -33,6 +33,14 @@
                 <option value="MEDIUM">Medium</option>
                 <option value="HIGH">High</option>
             </select>
+            <select id="filter-category">
+                <option value="">All Categories</option>
+                <option value="WORK">💼 Work</option>
+                <option value="PERSONAL">🏠 Personal</option>
+                <option value="STUDY">📚 Study</option>
+                <option value="FINANCE">💰 Finance</option>
+                <option value="OTHER">📌 Other</option>
+            </select>
         </div>
     </section>
 
@@ -108,9 +116,21 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="input-due-date">Due Date</label>
-                    <input type="date" id="input-due-date" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="input-category">Category</label>
+                        <select id="input-category">
+                            <option value="WORK">💼 Work</option>
+                            <option value="PERSONAL">🏠 Personal</option>
+                            <option value="STUDY">📚 Study</option>
+                            <option value="FINANCE">💰 Finance</option>
+                            <option value="OTHER" selected>📌 Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-due-date">Due Date</label>
+                        <input type="date" id="input-due-date" />
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="btn-cancel">Cancel</button>

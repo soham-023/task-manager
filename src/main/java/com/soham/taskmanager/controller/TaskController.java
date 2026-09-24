@@ -26,24 +26,26 @@ public class TaskController {
 
     /**
      * GET /api/tasks
-     * Retrieve all tasks. Supports optional filtering by status, priority, and search keyword.
+     * Retrieve all tasks. Supports optional filtering by status, priority, category, and search keyword.
      *
      * Query params:
      *   - status:   TODO | IN_PROGRESS | DONE
      *   - priority: LOW | MEDIUM | HIGH
+     *   - category: WORK | PERSONAL | STUDY | FINANCE | OTHER
      *   - search:   keyword to search titles
      */
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks(
             @RequestParam(required = false) Task.Status status,
             @RequestParam(required = false) Task.Priority priority,
+            @RequestParam(required = false) Task.Category category,
             @RequestParam(required = false) String search) {
 
         List<Task> tasks;
         if (search != null && !search.isBlank()) {
             tasks = taskService.searchTasks(search.trim());
         } else {
-            tasks = taskService.getAllTasks(status, priority);
+            tasks = taskService.getAllTasks(status, priority, category);
         }
         return ResponseEntity.ok(tasks);
     }

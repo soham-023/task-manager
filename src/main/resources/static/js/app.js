@@ -15,6 +15,7 @@ const taskForm = document.getElementById('task-form');
 const searchInput = document.getElementById('search-input');
 const filterStatus = document.getElementById('filter-status');
 const filterPriority = document.getElementById('filter-priority');
+const filterCategory = document.getElementById('filter-category');
 const toastEl = document.getElementById('toast');
 
 // Form fields
@@ -22,6 +23,7 @@ const inputTitle = document.getElementById('input-title');
 const inputDescription = document.getElementById('input-description');
 const inputPriority = document.getElementById('input-priority');
 const inputStatus = document.getElementById('input-status');
+const inputCategory = document.getElementById('input-category');
 const inputDueDate = document.getElementById('input-due-date');
 const titleChars = document.getElementById('title-chars');
 const descChars = document.getElementById('desc-chars');
@@ -45,6 +47,7 @@ async function fetchTasks(params = {}) {
     const query = new URLSearchParams();
     if (params.status) query.set('status', params.status);
     if (params.priority) query.set('priority', params.priority);
+    if (params.category) query.set('category', params.category);
     if (params.search) query.set('search', params.search);
 
     const url = query.toString() ? `${API_URL}?${query}` : API_URL;
@@ -131,6 +134,18 @@ function getDueDateBadge(dueDateStr, status) {
     }
 }
 
+function getCategoryBadge(category) {
+    const cat = category || 'OTHER';
+    const labels = {
+        WORK: '💼 Work',
+        PERSONAL: '🏠 Personal',
+        STUDY: '📚 Study',
+        FINANCE: '💰 Finance',
+        OTHER: '📌 Other'
+    };
+    return `<span class="badge badge-category-${cat}">${labels[cat] || cat}</span>`;
+}
+
 function renderTasks(tasks) {
     taskListEl.innerHTML = '';
 
@@ -163,6 +178,7 @@ function renderTasks(tasks) {
                 <div class="task-meta">
                     <span class="badge badge-priority-${task.priority}">${task.priority}</span>
                     <span class="badge badge-status-${task.status}">${formatStatus(task.status)}</span>
+                    ${getCategoryBadge(task.category)}
                     ${getDueDateBadge(task.dueDate, task.status)}
                     <span class="task-date">Created: ${createdDate}</span>
                 </div>
@@ -234,16 +250,18 @@ async function loadTasks() {
         const search = searchInput.value.trim();
         const status = filterStatus.value;
         const priority = filterPriority.value;
+        const category = filterCategory.value;
 
         if (search) params.search = search;
         if (status) params.status = status;
         if (priority) params.priority = priority;
+        if (category) params.category = category;
 
         const tasks = await fetchTasks(params);
         renderTasks(tasks);
 
         // Always fetch all tasks for accurate stats
-        const allTasks = (search || status || priority) ? await fetchTasks() : tasks;
+        const allTasks = (search || status || priority || category) ? await fetchTasks() : tasks;
         updateStats(allTasks);
     } catch (err) {
         showToast('Failed to load tasks', 'error');
@@ -260,6 +278,7 @@ function openNewModal() {
     taskForm.reset();
     inputPriority.value = 'MEDIUM';
     inputStatus.value = 'TODO';
+    inputCategory.value = 'OTHER';
     inputDueDate.value = '';
     titleChars.textContent = '0';
     descChars.textContent = '0';
@@ -275,6 +294,7 @@ function openEditModal(task) {
     inputDescription.value = task.description || '';
     inputPriority.value = task.priority;
     inputStatus.value = task.status;
+    inputCategory.value = task.category || 'OTHER';
     inputDueDate.value = task.dueDate || '';
     titleChars.textContent = task.title.length;
     descChars.textContent = (task.description || '').length;
@@ -350,6 +370,7 @@ taskForm.addEventListener('submit', async (e) => {
         description: inputDescription.value.trim() || null,
         priority: inputPriority.value,
         status: inputStatus.value,
+        category: inputCategory.value || 'OTHER',
         dueDate: inputDueDate.value || null,
     };
 
@@ -382,6 +403,7 @@ searchInput.addEventListener('input', () => {
 // Filters
 filterStatus.addEventListener('change', loadTasks);
 filterPriority.addEventListener('change', loadTasks);
+filterCategory.addEventListener('change', loadTasks);
 
 // ==========================================
 // Initial Load

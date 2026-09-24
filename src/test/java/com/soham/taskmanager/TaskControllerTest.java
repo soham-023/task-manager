@@ -98,6 +98,20 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$[0].title", is("Buy groceries")));
     }
 
+    @Test
+    void getAllTasks_filterByCategory() throws Exception {
+        Task t1 = new Task("Work Task", "Desc", Task.Priority.HIGH, Task.Status.TODO, null, Task.Category.WORK);
+        Task t2 = new Task("Personal Task", "Desc", Task.Priority.LOW, Task.Status.TODO, null, Task.Category.PERSONAL);
+        taskRepository.save(t1);
+        taskRepository.save(t2);
+
+        mockMvc.perform(get("/api/tasks").param("category", "WORK"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].title", is("Work Task")))
+                .andExpect(jsonPath("$[0].category", is("WORK")));
+    }
+
     // ==========================================
     // GET /api/tasks/{id}
     // ==========================================
@@ -160,6 +174,18 @@ class TaskControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.dueDate", is(tomorrow.toString())));
+    }
+
+    @Test
+    void createTask_withCategory_returnsCreatedTaskWithCategory() throws Exception {
+        Task newTask = new Task("Study Spring", "Learn Spring Boot 3", Task.Priority.MEDIUM, Task.Status.TODO, null, Task.Category.STUDY);
+
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTask)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.category", is("STUDY")));
     }
 
     @Test

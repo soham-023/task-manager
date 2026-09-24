@@ -28,6 +28,13 @@ public class Task {
         TODO, IN_PROGRESS, DONE
     }
 
+    /**
+     * Categories / Tags for organizing tasks.
+     */
+    public enum Category {
+        WORK, PERSONAL, STUDY, FINANCE, OTHER
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,6 +55,10 @@ public class Task {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.TODO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category = Category.OTHER;
 
     @Column(name = "due_date")
     private LocalDate dueDate;
@@ -81,15 +92,20 @@ public class Task {
     }
 
     public Task(String title, String description, Priority priority, Status status) {
-        this(title, description, priority, status, null);
+        this(title, description, priority, status, null, Category.OTHER);
     }
 
     public Task(String title, String description, Priority priority, Status status, LocalDate dueDate) {
+        this(title, description, priority, status, dueDate, Category.OTHER);
+    }
+
+    public Task(String title, String description, Priority priority, Status status, LocalDate dueDate, Category category) {
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.status = status;
         this.dueDate = dueDate;
+        this.category = (category != null) ? category : Category.OTHER;
     }
 
     // --- Getters and Setters ---
@@ -158,6 +174,14 @@ public class Task {
         this.dueDate = dueDate;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = (category != null) ? category : Category.OTHER;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -165,6 +189,7 @@ public class Task {
                 ", title='" + title + '\'' +
                 ", priority=" + priority +
                 ", status=" + status +
+                ", category=" + category +
                 ", dueDate=" + dueDate +
                 '}';
     }

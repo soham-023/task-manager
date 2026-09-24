@@ -21,17 +21,20 @@ public class TaskService {
     }
 
     /**
+     * Retrieve all tasks, optionally filtered by status, priority, and/or category.
+     */
+    public List<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category) {
+        if (status != null || priority != null || category != null) {
+            return taskRepository.findWithFilters(status, priority, category);
+        }
+        return taskRepository.findAll();
+    }
+
+    /**
      * Retrieve all tasks, optionally filtered by status and/or priority.
      */
     public List<Task> getAllTasks(Task.Status status, Task.Priority priority) {
-        if (status != null && priority != null) {
-            return taskRepository.findByStatusAndPriority(status, priority);
-        } else if (status != null) {
-            return taskRepository.findByStatus(status);
-        } else if (priority != null) {
-            return taskRepository.findByPriority(priority);
-        }
-        return taskRepository.findAll();
+        return getAllTasks(status, priority, null);
     }
 
     /**
@@ -63,6 +66,7 @@ public class TaskService {
         existing.setPriority(updatedTask.getPriority());
         existing.setStatus(updatedTask.getStatus());
         existing.setDueDate(updatedTask.getDueDate());
+        existing.setCategory(updatedTask.getCategory());
         return taskRepository.save(existing);
     }
 
