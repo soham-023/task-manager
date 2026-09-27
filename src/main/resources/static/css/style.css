@@ -57,8 +57,10 @@ body {
     font-weight: 700;
 }
 
+
 /* --- Buttons --- */
 .btn {
+   
     padding: 0.55rem 1.2rem;
     border: none;
     border-radius: 8px;
@@ -72,10 +74,13 @@ body {
 }
 
 .btn-primary {
+   
     background-color: var(--primary);
     color: white;
 }
+
 .btn-primary:hover {
+   
     background-color: var(--primary-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow);
@@ -111,8 +116,10 @@ body {
     background: var(--border);
 }
 
+
 /* --- Toolbar --- */
 .toolbar {
+   
     max-width: 900px;
     margin: 1.5rem auto 0;
     padding: 0 2rem;
