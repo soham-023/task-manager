@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the Task REST API.
  * Uses the full Spring context with an in-memory H2 database.
  */
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class TaskControllerTest {
@@ -39,6 +40,7 @@ class TaskControllerTest {
     }
 
     // --- Helper ---
+    
     private Task createSampleTask(String title, Task.Priority priority, Task.Status status) {
         Task task = new Task(title, "Description for " + title, priority, status);
         return taskRepository.save(task);
