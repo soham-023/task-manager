@@ -3,6 +3,7 @@
    ========================================== */
 
 /* --- Reset & Base --- */
+
 *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -37,6 +38,7 @@ body {
 }
 
 /* --- Header --- */
+
 .header {
     background: linear-gradient(135deg, var(--primary), #7c3aed);
     color: white;
@@ -80,6 +82,7 @@ body {
 }
 
 .btn-primary:hover {
+   
    
     background-color: var(--primary-hover);
     transform: translateY(-1px);
