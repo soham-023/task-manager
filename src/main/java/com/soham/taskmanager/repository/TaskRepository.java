@@ -1,11 +1,14 @@
 package com.soham.taskmanager.repository;
 
 import com.soham.taskmanager.model.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -47,8 +50,37 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                                @Param("category") Task.Category category);
 
     /**
+     * Flexible multi-criteria filter query with pagination and sorting.
+     */
+    @Query("SELECT t FROM Task t WHERE " +
+           "(:status IS NULL OR t.status = :status) AND " +
+           "(:priority IS NULL OR t.priority = :priority) AND " +
+           "(:category IS NULL OR t.category = :category)")
+    Page<Task> findWithFilters(@Param("status") Task.Status status,
+                               @Param("priority") Task.Priority priority,
+                               @Param("category") Task.Category category,
+                               Pageable pageable);
+
+    /**
      * Search tasks by title (case-insensitive, partial match).
      */
     @Query("SELECT t FROM Task t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Task> searchByTitle(@Param("keyword") String keyword);
+
+    /**
+     * Search tasks by title (case-insensitive, partial match) with pagination.
+     */
+    @Query("SELECT t FROM Task t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<Task> searchByTitle(@Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * Count tasks by status for dashboard statistics.
+     */
+    long countByStatus(Task.Status status);
+
+    /**
+     * Count overdue tasks (status is not DONE and dueDate is strictly before today).
+     */
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.status != 'DONE' AND t.dueDate IS NOT NULL AND t.dueDate < :today")
+    long countOverdueTasks(@Param("today") LocalDate today);
 }

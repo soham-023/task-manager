@@ -3,6 +3,10 @@ package com.soham.taskmanager.controller;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,28 +30,50 @@ public class TaskController {
 
     /**
      * GET /api/tasks
-     * Retrieve all tasks. Supports optional filtering by status, priority, category, and search keyword.
+     * Retrieve tasks with server-side pagination, sorting, and optional filtering.
      *
      * Query params:
      *   - status:   TODO | IN_PROGRESS | DONE
      *   - priority: LOW | MEDIUM | HIGH
      *   - category: WORK | PERSONAL | STUDY | FINANCE | OTHER
      *   - search:   keyword to search titles
+     *   - page:     0-indexed page number (default 0)
+     *   - size:     page size (default 6)
+     *   - sortBy:   createdAt | dueDate | priority | title (default "createdAt")
+     *   - sortDir:  asc | desc (default "desc")
      */
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks(
+    public ResponseEntity<Page<Task>> getAllTasks(
             @RequestParam(required = false) Task.Status status,
             @RequestParam(required = false) Task.Priority priority,
             @RequestParam(required = false) Task.Category category,
-            @RequestParam(required = false) String search) {
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
 
-        List<Task> tasks;
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Task> tasks;
         if (search != null && !search.isBlank()) {
-            tasks = taskService.searchTasks(search.trim());
+            tasks = taskService.searchTasks(search.trim(), pageable);
         } else {
-            tasks = taskService.getAllTasks(status, priority, category);
+            tasks = taskService.getAllTasks(status, priority, category, pageable);
         }
         return ResponseEntity.ok(tasks);
+    }
+
+    /**
+     * GET /api/tasks/stats
+     * Return aggregate task counts (total, todo, inProgress, done, overdue) for the dashboard.
+     */
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Long>> getTaskStats() {
+        return ResponseEntity.ok(taskService.getTaskStats());
     }
 
     /**

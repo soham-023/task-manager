@@ -54,7 +54,8 @@ class TaskControllerTest {
     void getAllTasks_returnsEmptyList_whenNoTasks() throws Exception {
         mockMvc.perform(get("/api/tasks"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)))
+                .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
     @Test
@@ -64,7 +65,8 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.totalElements", is(2)));
     }
 
     @Test
@@ -74,8 +76,8 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks").param("status", "TODO"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].title", is("Task A")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title", is("Task A")));
     }
 
     @Test
@@ -85,8 +87,8 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks").param("priority", "HIGH"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].title", is("High Task")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title", is("High Task")));
     }
 
     @Test
@@ -96,8 +98,8 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks").param("search", "grocer"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].title", is("Buy groceries")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title", is("Buy groceries")));
     }
 
     @Test
@@ -109,9 +111,64 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks").param("category", "WORK"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].title", is("Work Task")))
-                .andExpect(jsonPath("$[0].category", is("WORK")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title", is("Work Task")))
+                .andExpect(jsonPath("$.content[0].category", is("WORK")));
+    }
+
+    @Test
+    void getAllTasks_pagination() throws Exception {
+        for (int i = 1; i <= 5; i++) {
+            createSampleTask("Task " + i, Task.Priority.LOW, Task.Status.TODO);
+        }
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("page", "0")
+                        .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.totalElements", is(5)))
+                .andExpect(jsonPath("$.totalPages", is(3)))
+                .andExpect(jsonPath("$.number", is(0)));
+    }
+
+    @Test
+    void getAllTasks_sorting() throws Exception {
+        createSampleTask("Alpha Task", Task.Priority.LOW, Task.Status.TODO);
+        createSampleTask("Zeta Task", Task.Priority.HIGH, Task.Status.TODO);
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("sortBy", "title")
+                        .param("sortDir", "asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title", is("Alpha Task")))
+                .andExpect(jsonPath("$.content[1].title", is("Zeta Task")));
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("sortBy", "title")
+                        .param("sortDir", "desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title", is("Zeta Task")))
+                .andExpect(jsonPath("$.content[1].title", is("Alpha Task")));
+    }
+
+    @Test
+    void getTaskStats_returnsCounts() throws Exception {
+        createSampleTask("Task 1", Task.Priority.LOW, Task.Status.TODO);
+        createSampleTask("Task 2", Task.Priority.MEDIUM, Task.Status.IN_PROGRESS);
+        createSampleTask("Task 3", Task.Priority.HIGH, Task.Status.DONE);
+
+        // Overdue task (yesterday)
+        Task overdueTask = new Task("Overdue", "Desc", Task.Priority.HIGH, Task.Status.TODO, LocalDate.now().minusDays(1));
+        taskRepository.save(overdueTask);
+
+        mockMvc.perform(get("/api/tasks/stats"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total", is(4)))
+                .andExpect(jsonPath("$.todo", is(2)))
+                .andExpect(jsonPath("$.inProgress", is(1)))
+                .andExpect(jsonPath("$.done", is(1)))
+                .andExpect(jsonPath("$.overdue", is(1)));
     }
 
     // ==========================================

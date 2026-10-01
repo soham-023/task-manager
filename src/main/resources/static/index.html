@@ -41,6 +41,15 @@
                 <option value="FINANCE">💰 Finance</option>
                 <option value="OTHER">📌 Other</option>
             </select>
+            <select id="sort-by">
+                <option value="createdAt,desc">🕒 Newest First</option>
+                <option value="createdAt,asc">🕒 Oldest First</option>
+                <option value="dueDate,asc">📅 Due Date (Earliest)</option>
+                <option value="dueDate,desc">📅 Due Date (Latest)</option>
+                <option value="priority,desc">🔥 Priority (High to Low)</option>
+                <option value="priority,asc">🟢 Priority (Low to High)</option>
+                <option value="title,asc">🔤 Title (A-Z)</option>
+            </select>
         </div>
     </section>
 
@@ -79,6 +88,21 @@
         <h2>No tasks found</h2>
         <p>Click "+ New Task" to create your first task.</p>
     </div>
+
+    <!-- Pagination -->
+    <section class="pagination-bar" id="pagination-bar" style="display: none;">
+        <button id="btn-prev-page" class="btn btn-secondary btn-page" disabled>&larr; Prev</button>
+        <div class="page-numbers" id="page-numbers"></div>
+        <button id="btn-next-page" class="btn btn-secondary btn-page" disabled>Next &rarr;</button>
+        <div class="page-size-selector">
+            <label for="select-page-size">Per page:</label>
+            <select id="select-page-size">
+                <option value="4">4</option>
+                <option value="6" selected>6</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+    </section>
 
     <!-- Modal: Create / Edit Task -->
     <div class="modal-overlay" id="modal-overlay">

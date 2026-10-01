@@ -1,6 +1,6 @@
 /**
  * Task Manager — Frontend Application Logic
- * Handles CRUD operations, filtering, search, and UI interactions
+ * Handles CRUD operations, filtering, search, sorting, pagination, and UI interactions
  * via the REST API at /api/tasks.
  */
 
@@ -16,7 +16,15 @@ const searchInput = document.getElementById('search-input');
 const filterStatus = document.getElementById('filter-status');
 const filterPriority = document.getElementById('filter-priority');
 const filterCategory = document.getElementById('filter-category');
+const sortBySelect = document.getElementById('sort-by');
 const toastEl = document.getElementById('toast');
+
+// Pagination elements
+const paginationBar = document.getElementById('pagination-bar');
+const btnPrevPage = document.getElementById('btn-prev-page');
+const btnNextPage = document.getElementById('btn-next-page');
+const pageNumbersEl = document.getElementById('page-numbers');
+const selectPageSize = document.getElementById('select-page-size');
 
 // Form fields
 const inputTitle = document.getElementById('input-title');
@@ -38,6 +46,11 @@ const statOverdue = document.getElementById('stat-overdue');
 // State
 let editingTaskId = null;
 let searchTimeout = null;
+let currentPage = 0;
+let pageSize = 6;
+let currentSort = 'createdAt';
+let currentSortDir = 'desc';
+let totalPages = 0;
 
 // ==========================================
 // API Functions
@@ -45,6 +58,10 @@ let searchTimeout = null;
 
 async function fetchTasks(params = {}) {
     const query = new URLSearchParams();
+    if (params.page !== undefined) query.set('page', params.page);
+    if (params.size !== undefined) query.set('size', params.size);
+    if (params.sortBy) query.set('sortBy', params.sortBy);
+    if (params.sortDir) query.set('sortDir', params.sortDir);
     if (params.status) query.set('status', params.status);
     if (params.priority) query.set('priority', params.priority);
     if (params.category) query.set('category', params.category);
@@ -53,6 +70,12 @@ async function fetchTasks(params = {}) {
     const url = query.toString() ? `${API_URL}?${query}` : API_URL;
     const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to fetch tasks');
+    return res.json();
+}
+
+async function fetchStats() {
+    const res = await fetch(`${API_URL}/stats`);
+    if (!res.ok) throw new Error('Failed to fetch stats');
     return res.json();
 }
 
@@ -149,7 +172,7 @@ function getCategoryBadge(category) {
 function renderTasks(tasks) {
     taskListEl.innerHTML = '';
 
-    if (tasks.length === 0) {
+    if (!tasks || tasks.length === 0) {
         taskListEl.style.display = 'none';
         emptyStateEl.style.display = 'block';
         return;
@@ -221,32 +244,66 @@ function renderTasks(tasks) {
     });
 }
 
-function updateStats(tasks) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+function renderPagination(pageData) {
+    totalPages = pageData.totalPages;
+    currentPage = pageData.number;
 
-    const overdueCount = tasks.filter(t => {
-        if (t.status === 'DONE' || !t.dueDate) return false;
-        const [y, m, d] = t.dueDate.split('-').map(Number);
-        const due = new Date(y, m - 1, d);
-        due.setHours(0, 0, 0, 0);
-        return due < today;
-    }).length;
+    if (!pageData.totalElements || pageData.totalElements === 0) {
+        paginationBar.style.display = 'none';
+        return;
+    }
 
-    statTotal.textContent = tasks.length;
-    statTodo.textContent = tasks.filter(t => t.status === 'TODO').length;
-    statInProgress.textContent = tasks.filter(t => t.status === 'IN_PROGRESS').length;
-    statDone.textContent = tasks.filter(t => t.status === 'DONE').length;
-    statOverdue.textContent = overdueCount;
+    paginationBar.style.display = 'flex';
+    btnPrevPage.disabled = pageData.first;
+    btnNextPage.disabled = pageData.last;
+
+    // Render page buttons
+    pageNumbersEl.innerHTML = '';
+    for (let i = 0; i < totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `page-num-btn ${i === currentPage ? 'active' : ''}`;
+        btn.textContent = i + 1;
+        btn.title = `Go to page ${i + 1}`;
+        btn.addEventListener('click', () => {
+            if (i !== currentPage) {
+                currentPage = i;
+                loadTasks();
+            }
+        });
+        pageNumbersEl.appendChild(btn);
+    }
+}
+
+function updateStats(stats) {
+    statTotal.textContent = stats.total || 0;
+    statTodo.textContent = stats.todo || 0;
+    statInProgress.textContent = stats.inProgress || 0;
+    statDone.textContent = stats.done || 0;
+    statOverdue.textContent = stats.overdue || 0;
 }
 
 // ==========================================
-// Load Tasks (with filters)
+// Load Tasks & Stats
 // ==========================================
+
+async function loadStats() {
+    try {
+        const stats = await fetchStats();
+        updateStats(stats);
+    } catch (err) {
+        console.error('Failed to load stats:', err);
+    }
+}
 
 async function loadTasks() {
     try {
-        const params = {};
+        const params = {
+            page: currentPage,
+            size: pageSize,
+            sortBy: currentSort,
+            sortDir: currentSortDir,
+        };
+
         const search = searchInput.value.trim();
         const status = filterStatus.value;
         const priority = filterPriority.value;
@@ -257,12 +314,17 @@ async function loadTasks() {
         if (priority) params.priority = priority;
         if (category) params.category = category;
 
-        const tasks = await fetchTasks(params);
-        renderTasks(tasks);
+        const data = await fetchTasks(params);
 
-        // Always fetch all tasks for accurate stats
-        const allTasks = (search || status || priority || category) ? await fetchTasks() : tasks;
-        updateStats(allTasks);
+        // Edge case: if current page has no tasks after a deletion, go to previous page
+        if (data.content.length === 0 && currentPage > 0) {
+            currentPage = Math.max(0, data.totalPages - 1);
+            return loadTasks();
+        }
+
+        renderTasks(data.content);
+        renderPagination(data);
+        loadStats();
     } catch (err) {
         showToast('Failed to load tasks', 'error');
     }
@@ -397,13 +459,56 @@ taskForm.addEventListener('submit', async (e) => {
 // Search (debounced)
 searchInput.addEventListener('input', () => {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(loadTasks, 300);
+    searchTimeout = setTimeout(() => {
+        currentPage = 0;
+        loadTasks();
+    }, 300);
 });
 
 // Filters
-filterStatus.addEventListener('change', loadTasks);
-filterPriority.addEventListener('change', loadTasks);
-filterCategory.addEventListener('change', loadTasks);
+filterStatus.addEventListener('change', () => {
+    currentPage = 0;
+    loadTasks();
+});
+filterPriority.addEventListener('change', () => {
+    currentPage = 0;
+    loadTasks();
+});
+filterCategory.addEventListener('change', () => {
+    currentPage = 0;
+    loadTasks();
+});
+
+// Sort
+sortBySelect.addEventListener('change', (e) => {
+    const [field, dir] = e.target.value.split(',');
+    currentSort = field;
+    currentSortDir = dir;
+    currentPage = 0;
+    loadTasks();
+});
+
+// Page size selector
+selectPageSize.addEventListener('change', (e) => {
+    pageSize = parseInt(e.target.value, 10);
+    currentPage = 0;
+    loadTasks();
+});
+
+// Pagination buttons
+btnPrevPage.addEventListener('click', () => {
+    if (currentPage > 0) {
+        currentPage--;
+        loadTasks();
+    }
+});
+
+btnNextPage.addEventListener('click', () => {
+    if (currentPage < totalPages - 1) {
+        currentPage++;
+        loadTasks();
+    }
+});
 
 // ==========================================
 // Initial Load

@@ -3,9 +3,14 @@ package com.soham.taskmanager.service;
 import com.soham.taskmanager.exception.ResourceNotFoundException;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.repository.TaskRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service layer containing business logic for Task operations.
@@ -18,6 +23,13 @@ public class TaskService {
 
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
+    }
+
+    /**
+     * Retrieve tasks with pagination, sorting, and optional filtering by status, priority, and/or category.
+     */
+    public Page<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category, Pageable pageable) {
+        return taskRepository.findWithFilters(status, priority, category, pageable);
     }
 
     /**
@@ -97,5 +109,31 @@ public class TaskService {
      */
     public List<Task> searchTasks(String keyword) {
         return taskRepository.searchByTitle(keyword);
+    }
+
+    /**
+     * Search tasks by title keyword with pagination.
+     */
+    public Page<Task> searchTasks(String keyword, Pageable pageable) {
+        return taskRepository.searchByTitle(keyword, pageable);
+    }
+
+    /**
+     * Compute aggregate metrics across all tasks for dashboard statistics.
+     */
+    public Map<String, Long> getTaskStats() {
+        Map<String, Long> stats = new HashMap<>();
+        long total = taskRepository.count();
+        long todo = taskRepository.countByStatus(Task.Status.TODO);
+        long inProgress = taskRepository.countByStatus(Task.Status.IN_PROGRESS);
+        long done = taskRepository.countByStatus(Task.Status.DONE);
+        long overdue = taskRepository.countOverdueTasks(LocalDate.now());
+
+        stats.put("total", total);
+        stats.put("todo", todo);
+        stats.put("inProgress", inProgress);
+        stats.put("done", done);
+        stats.put("overdue", overdue);
+        return stats;
     }
 }
