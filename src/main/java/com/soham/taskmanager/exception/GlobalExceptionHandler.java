@@ -17,12 +17,14 @@ import java.util.Map;
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    
 
     /**
      * Handle resource not found (404).
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
+        
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", HttpStatus.NOT_FOUND.value());
