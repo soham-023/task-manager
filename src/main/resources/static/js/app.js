@@ -4,6 +4,7 @@
  * via the REST API at /api/tasks.
  */
 
+
 const API_URL = '/api/tasks';
 
 // --- DOM Elements ---
@@ -20,6 +21,7 @@ const sortBySelect = document.getElementById('sort-by');
 const toastEl = document.getElementById('toast');
 
 // Pagination elements
+
 const paginationBar = document.getElementById('pagination-bar');
 const btnPrevPage = document.getElementById('btn-prev-page');
 const btnNextPage = document.getElementById('btn-next-page');
