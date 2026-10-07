@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
  * JPA Entity representing a Task.
  * Each task has a title, optional description, priority level, completion status, and optional due date.
  */
+
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -28,6 +29,7 @@ public class Task {
         TODO, IN_PROGRESS, DONE
     }
 
+    
     /**
      * Categories / Tags for organizing tasks.
      */
@@ -38,6 +40,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
 
     @NotBlank(message = "Title is required")
     @Size(max = 100, message = "Title must be at most 100 characters")
