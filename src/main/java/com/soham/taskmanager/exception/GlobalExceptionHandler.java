@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Global exception handler that catches exceptions thrown by controllers
  * and returns consistent, structured JSON error responses.
@@ -36,6 +37,7 @@ public class GlobalExceptionHandler {
     /**
      * Handle validation errors (400) — returns field-level error messages.
      */
+    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, String> fieldErrors = new HashMap<>();
