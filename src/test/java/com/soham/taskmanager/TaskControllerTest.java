@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+    
 class TaskControllerTest {
 
     @Autowired
@@ -46,6 +47,7 @@ class TaskControllerTest {
     private Task createSampleTask(String title, Task.Priority priority, Task.Status status) {
         Task task = new Task(title, "Description for " + title, priority, status);
         return taskRepository.save(task);
+        
     }
 
     // ==========================================
