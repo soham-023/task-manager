@@ -19,6 +19,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     
+    
 
     /**
      * Handle resource not found (404).
@@ -40,6 +41,7 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        
         Map<String, String> fieldErrors = new HashMap<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             fieldErrors.put(error.getField(), error.getDefaultMessage());
