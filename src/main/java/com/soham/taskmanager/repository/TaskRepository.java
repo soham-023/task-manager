@@ -16,6 +16,7 @@ import java.util.List;
  * Spring Data JPA automatically provides CRUD implementations at runtime.
  */
 @Repository
+    
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     /**
@@ -27,6 +28,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      * Find tasks by priority.
      */
     List<Task> findByPriority(Task.Priority priority);
+    
 
     /**
      * Find tasks by both status and priority.
