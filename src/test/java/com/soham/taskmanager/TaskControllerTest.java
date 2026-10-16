@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the Task REST API.
  * Uses the full Spring context with an in-memory H2 database.
  */
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -43,6 +45,7 @@ class TaskControllerTest {
     // --- Helper ---
     
     private Task createSampleTask(String title, Task.Priority priority, Task.Status status) {
+        
         Task task = new Task(title, "Description for " + title, priority, status);
         return taskRepository.save(task);
         
