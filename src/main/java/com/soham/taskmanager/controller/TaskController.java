@@ -5,11 +5,13 @@ import com.soham.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class TaskController {
 
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
+        
     }
 
     /**
@@ -47,6 +50,7 @@ public class TaskController {
             @RequestParam(required = false) Task.Status status,
             @RequestParam(required = false) Task.Priority priority,
             @RequestParam(required = false) Task.Category category,
+        
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size,
