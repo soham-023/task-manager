@@ -29,11 +29,13 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      */
     List<Task> findByPriority(Task.Priority priority);
     
+    
 
     /**
      * Find tasks by both status and priority.
      */
     List<Task> findByStatusAndPriority(Task.Status status, Task.Priority priority);
+    
 
     /**
      * Find tasks by category.
@@ -49,7 +51,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            "(:category IS NULL OR t.category = :category)")
     List<Task> findWithFilters(@Param("status") Task.Status status,
                                @Param("priority") Task.Priority priority,
+                               
                                @Param("category") Task.Category category);
+    
 
     /**
      * Flexible multi-criteria filter query with pagination and sorting.
