@@ -45,11 +45,13 @@ public class Task {
     @NotBlank(message = "Title is required")
     @Size(max = 100, message = "Title must be at most 100 characters")
     @Column(nullable = false, length = 100)
+    
     private String title;
 
     @Size(max = 500, message = "Description must be at most 500 characters")
     @Column(length = 500)
     private String description;
+    
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -62,6 +64,7 @@ public class Task {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category = Category.OTHER;
+    
 
     @Column(name = "due_date")
     private LocalDate dueDate;
@@ -71,6 +74,7 @@ public class Task {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+    
 
     /**
      * Automatically set timestamps before persisting.
@@ -79,6 +83,7 @@ public class Task {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        
     }
 
     /**
@@ -87,6 +92,7 @@ public class Task {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+        
     }
 
     // --- Constructors ---
@@ -96,6 +102,7 @@ public class Task {
 
     public Task(String title, String description, Priority priority, Status status) {
         this(title, description, priority, status, null, Category.OTHER);
+        
     }
 
     public Task(String title, String description, Priority priority, Status status, LocalDate dueDate) {
@@ -105,6 +112,7 @@ public class Task {
     public Task(String title, String description, Priority priority, Status status, LocalDate dueDate, Category category) {
         this.title = title;
         this.description = description;
+        
         this.priority = priority;
         this.status = status;
         this.dueDate = dueDate;
