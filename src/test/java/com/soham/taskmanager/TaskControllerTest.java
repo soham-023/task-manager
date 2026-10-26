@@ -30,6 +30,7 @@ class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    
 
     @Autowired
     private TaskRepository taskRepository;
@@ -47,6 +48,7 @@ class TaskControllerTest {
     private Task createSampleTask(String title, Task.Priority priority, Task.Status status) {
         
         Task task = new Task(title, "Description for " + title, priority, status);
+        
         return taskRepository.save(task);
         
     }
@@ -61,6 +63,7 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(0)))
                 .andExpect(jsonPath("$.totalElements", is(0)));
+        
     }
 
     @Test
