@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Service layer containing business logic for Task operations.
  * Acts as an intermediary between the controller and repository.
@@ -22,6 +23,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     public TaskService(TaskRepository taskRepository) {
+        
         this.taskRepository = taskRepository;
     }
 
@@ -29,6 +31,7 @@ public class TaskService {
      * Retrieve tasks with pagination, sorting, and optional filtering by status, priority, and/or category.
      */
     public Page<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category, Pageable pageable) {
+        
         return taskRepository.findWithFilters(status, priority, category, pageable);
     }
 
@@ -36,6 +39,7 @@ public class TaskService {
      * Retrieve all tasks, optionally filtered by status, priority, and/or category.
      */
     public List<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category) {
+        
         if (status != null || priority != null || category != null) {
             return taskRepository.findWithFilters(status, priority, category);
         }
@@ -47,6 +51,7 @@ public class TaskService {
      */
     public List<Task> getAllTasks(Task.Status status, Task.Priority priority) {
         return getAllTasks(status, priority, null);
+        
     }
 
     /**
