@@ -59,9 +59,12 @@ class TaskControllerTest {
 
     @Test
     void getAllTasks_returnsEmptyList_whenNoTasks() throws Exception {
+        
         mockMvc.perform(get("/api/tasks"))
                 .andExpect(status().isOk())
+            
                 .andExpect(jsonPath("$.content", hasSize(0)))
+            
                 .andExpect(jsonPath("$.totalElements", is(0)));
         
     }
@@ -91,9 +94,11 @@ class TaskControllerTest {
     @Test
     void getAllTasks_filterByPriority() throws Exception {
         createSampleTask("Low Task", Task.Priority.LOW, Task.Status.TODO);
+        
         createSampleTask("High Task", Task.Priority.HIGH, Task.Status.TODO);
 
         mockMvc.perform(get("/api/tasks").param("priority", "HIGH"))
+            
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].title", is("High Task")));
