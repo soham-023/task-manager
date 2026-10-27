@@ -128,6 +128,7 @@ public class TaskService {
      */
     public Map<String, Long> getTaskStats() {
         Map<String, Long> stats = new HashMap<>();
+        
         long total = taskRepository.count();
         long todo = taskRepository.countByStatus(Task.Status.TODO);
         long inProgress = taskRepository.countByStatus(Task.Status.IN_PROGRESS);
