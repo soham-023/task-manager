@@ -49,6 +49,7 @@ public class TaskController {
     public ResponseEntity<Page<Task>> getAllTasks(
             @RequestParam(required = false) Task.Status status,
             @RequestParam(required = false) Task.Priority priority,
+        
             @RequestParam(required = false) Task.Category category,
         
             @RequestParam(required = false) String search,
@@ -67,6 +68,7 @@ public class TaskController {
             tasks = taskService.searchTasks(search.trim(), pageable);
         } else {
             tasks = taskService.getAllTasks(status, priority, category, pageable);
+            
         }
         return ResponseEntity.ok(tasks);
     }
@@ -77,6 +79,7 @@ public class TaskController {
      */
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Long>> getTaskStats() {
+        
         return ResponseEntity.ok(taskService.getTaskStats());
     }
 
@@ -86,8 +89,10 @@ public class TaskController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+        
         Task task = taskService.getTaskById(id);
         return ResponseEntity.ok(task);
+        
     }
 
     /**
@@ -97,6 +102,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
         Task created = taskService.createTask(task);
+        
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -107,6 +113,7 @@ public class TaskController {
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task task) {
         Task updated = taskService.updateTask(id, task);
+        
         return ResponseEntity.ok(updated);
     }
 
