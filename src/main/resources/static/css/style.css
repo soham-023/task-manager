@@ -1,7 +1,6 @@
 /* ==========================================
    Task Manager — Stylesheet
    ========================================== */
-
 /* --- Reset & Base --- */
 
 *, *::before, *::after {
@@ -101,7 +100,9 @@ body {
 
 .btn-danger {
     background-color: transparent;
+   
     color: var(--danger);
+   
     padding: 0.4rem 0.6rem;
 }
 .btn-danger:hover {
@@ -127,8 +128,10 @@ body {
    
     max-width: 900px;
     margin: 1.5rem auto 0;
+   
     padding: 0 2rem;
     display: flex;
+   
     gap: 1rem;
     flex-wrap: wrap;
     align-items: center;
