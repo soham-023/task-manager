@@ -313,8 +313,10 @@ body {
 .badge-priority-MEDIUM { background: #fffbeb; color: #b45309; }
 .badge-priority-LOW { background: #f0fdf4; color: #15803d; }
 
+
 .badge-status-TODO { background: var(--primary-light); color: var(--primary); }
 .badge-status-IN_PROGRESS { background: #fef3c7; color: #92400e; }
+
 .badge-status-DONE { background: #dcfce7; color: #166534; }
 
 /* Category Badges */
@@ -334,6 +336,7 @@ body {
     background: #fffbeb;
     color: #b45309;
     border: 1px solid #fde68a;
+   
     font-weight: 700;
 }
 
@@ -437,6 +440,7 @@ body {
     padding: 0.2rem 0.5rem;
     border-radius: 6px;
     transition: background var(--transition);
+   
 }
 .btn-close:hover {
     background: var(--border);
@@ -457,6 +461,7 @@ form {
     font-size: 0.85rem;
     font-weight: 600;
     margin-bottom: 0.3rem;
+   
     color: var(--text);
 }
 
