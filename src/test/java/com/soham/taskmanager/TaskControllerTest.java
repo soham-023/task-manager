@@ -275,9 +275,11 @@ class TaskControllerTest {
         mockMvc.perform(put("/api/tasks/" + task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
+            
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("Updated Title")))
                 .andExpect(jsonPath("$.priority", is("HIGH")))
+            
                 .andExpect(jsonPath("$.status", is("IN_PROGRESS")))
                 .andExpect(jsonPath("$.dueDate", is(nextWeek.toString())));
     }
@@ -291,6 +293,7 @@ class TaskControllerTest {
         Task task = createSampleTask("To Delete", Task.Priority.LOW, Task.Status.TODO);
 
         mockMvc.perform(delete("/api/tasks/" + task.getId()))
+            
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/tasks/" + task.getId()))
@@ -304,17 +307,21 @@ class TaskControllerTest {
     @Test
     void updateTaskStatus_updatesStatus() throws Exception {
         Task task = createSampleTask("Status Task", Task.Priority.MEDIUM, Task.Status.TODO);
+        
 
         mockMvc.perform(patch("/api/tasks/" + task.getId() + "/status")
                         .contentType(MediaType.APPLICATION_JSON)
+                        
                         .content("{\"status\": \"DONE\"}"))
                 .andExpect(status().isOk())
+            
                 .andExpect(jsonPath("$.status", is("DONE")));
     }
 
     @Test
     void updateTaskStatus_returns400_forInvalidStatus() throws Exception {
         Task task = createSampleTask("Status Task", Task.Priority.MEDIUM, Task.Status.TODO);
+        
 
         mockMvc.perform(patch("/api/tasks/" + task.getId() + "/status")
                         .contentType(MediaType.APPLICATION_JSON)
