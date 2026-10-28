@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.*;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -30,7 +31,6 @@ class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    
 
     @Autowired
     private TaskRepository taskRepository;
@@ -41,12 +41,12 @@ class TaskControllerTest {
     @BeforeEach
     void setUp() {
         taskRepository.deleteAll();
+        
     }
 
     // --- Helper ---
     
     private Task createSampleTask(String title, Task.Priority priority, Task.Status status) {
-        
         Task task = new Task(title, "Description for " + title, priority, status);
         
         return taskRepository.save(task);
@@ -64,7 +64,6 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
             
                 .andExpect(jsonPath("$.content", hasSize(0)))
-            
                 .andExpect(jsonPath("$.totalElements", is(0)));
         
     }
@@ -78,6 +77,7 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
                 .andExpect(jsonPath("$.totalElements", is(2)));
+        
     }
 
     @Test
