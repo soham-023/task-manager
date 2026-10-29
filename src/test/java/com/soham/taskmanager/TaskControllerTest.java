@@ -31,6 +31,7 @@ class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    
 
     @Autowired
     private TaskRepository taskRepository;
@@ -75,7 +76,9 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks"))
                 .andExpect(status().isOk())
+            
                 .andExpect(jsonPath("$.content", hasSize(2)))
+            
                 .andExpect(jsonPath("$.totalElements", is(2)));
         
     }
@@ -88,7 +91,9 @@ class TaskControllerTest {
         mockMvc.perform(get("/api/tasks").param("status", "TODO"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
+            
                 .andExpect(jsonPath("$.content[0].title", is("Task A")));
+        
     }
 
     @Test
@@ -101,6 +106,7 @@ class TaskControllerTest {
             
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
+            
                 .andExpect(jsonPath("$.content[0].title", is("High Task")));
     }
 
@@ -111,6 +117,7 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks").param("search", "grocer"))
                 .andExpect(status().isOk())
+            
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].title", is("Buy groceries")));
     }
