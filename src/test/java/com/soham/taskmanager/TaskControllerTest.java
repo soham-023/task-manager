@@ -150,6 +150,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.totalElements", is(5)))
             
                 .andExpect(jsonPath("$.totalPages", is(3)))
+            
                 .andExpect(jsonPath("$.number", is(0)));
     }
 
@@ -158,6 +159,7 @@ class TaskControllerTest {
         createSampleTask("Alpha Task", Task.Priority.LOW, Task.Status.TODO);
         
         createSampleTask("Zeta Task", Task.Priority.HIGH, Task.Status.TODO);
+        
 
         mockMvc.perform(get("/api/tasks")
                         .param("sortBy", "title")
@@ -166,6 +168,7 @@ class TaskControllerTest {
             
                 .andExpect(jsonPath("$.content[0].title", is("Alpha Task")))
                 .andExpect(jsonPath("$.content[1].title", is("Zeta Task")));
+        
         
 
         mockMvc.perform(get("/api/tasks")
