@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
 /**
  * JPA Entity representing a Task.
  * Each task has a title, optional description, priority level, completion status, and optional due date.
@@ -19,6 +20,7 @@ public class Task {
      * Priority levels for a task.
      */
     public enum Priority {
+        
         LOW, MEDIUM, HIGH
     }
 
@@ -39,6 +41,7 @@ public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
     private Long id;
     
 
