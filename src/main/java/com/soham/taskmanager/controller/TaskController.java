@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -27,6 +26,7 @@ import java.util.Map;
 public class TaskController {
 
     private final TaskService taskService;
+    
 
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
@@ -63,7 +63,9 @@ public class TaskController {
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
+        
         Pageable pageable = PageRequest.of(page, size, sort);
+        
 
         Page<Task> tasks;
         if (search != null && !search.isBlank()) {
@@ -105,6 +107,7 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
         Task created = taskService.createTask(task);
         
+        
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -136,10 +139,12 @@ public class TaskController {
      */
     @PatchMapping("/{id}/status")
     public ResponseEntity<Task> updateTaskStatus(
+        
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
 
         String statusStr = body.get("status");
+        
         if (statusStr == null || statusStr.isBlank()) {
             throw new IllegalArgumentException("Status is required");
         }
