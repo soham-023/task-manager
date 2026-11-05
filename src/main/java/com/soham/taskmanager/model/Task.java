@@ -1,5 +1,4 @@
 package com.soham.taskmanager.model;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -29,6 +28,7 @@ public class Task {
      */
     public enum Status {
         TODO, IN_PROGRESS, DONE
+        
     }
 
     
@@ -76,6 +76,7 @@ public class Task {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    
     private LocalDateTime updatedAt;
     
 
@@ -85,6 +86,7 @@ public class Task {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        
         this.updatedAt = LocalDateTime.now();
         
     }
@@ -104,6 +106,7 @@ public class Task {
     }
 
     public Task(String title, String description, Priority priority, Status status) {
+        
         this(title, description, priority, status, null, Category.OTHER);
         
     }
@@ -115,7 +118,6 @@ public class Task {
     public Task(String title, String description, Priority priority, Status status, LocalDate dueDate, Category category) {
         this.title = title;
         this.description = description;
-        
         this.priority = priority;
         this.status = status;
         this.dueDate = dueDate;
@@ -129,6 +131,7 @@ public class Task {
     }
 
     public void setId(Long id) {
+        
         this.id = id;
     }
 
@@ -201,6 +204,7 @@ public class Task {
         return "Task{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
+            
                 ", priority=" + priority +
                 ", status=" + status +
                 ", category=" + category +
