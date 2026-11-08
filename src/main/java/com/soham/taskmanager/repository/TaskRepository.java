@@ -85,8 +85,20 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     long countByStatus(Task.Status status);
 
     /**
-     * Count overdue tasks (status is not DONE and dueDate is strictly before today).
+     * Count tasks whose status differs from {@code excludedStatus} and whose
+     * due date is strictly before {@code today}.
      */
-    @Query("SELECT COUNT(t) FROM Task t WHERE t.status != 'DONE' AND t.dueDate IS NOT NULL AND t.dueDate < :today")
-    long countOverdueTasks(@Param("today") LocalDate today);
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.status <> :excludedStatus " +
+           "AND t.dueDate IS NOT NULL AND t.dueDate < :today")
+    long countByStatusNotAndDueDateBefore(@Param("excludedStatus") Task.Status excludedStatus,
+                                          @Param("today") LocalDate today);
+
+    /**
+     * Count overdue tasks (status is not DONE and dueDate is strictly before today).
+     * Binds the enum as a parameter instead of a hard-coded string literal,
+     * so renaming the enum constant cannot silently break the query.
+     */
+    default long countOverdueTasks(LocalDate today) {
+        return countByStatusNotAndDueDateBefore(Task.Status.DONE, today);
+    }
 }
