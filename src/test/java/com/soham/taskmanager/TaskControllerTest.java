@@ -204,6 +204,28 @@ class TaskControllerTest {
     }
 
     @Test
+    void getAllTasks_returns400_forUnknownStatusFilter() throws Exception {
+        mockMvc.perform(get("/api/tasks").param("status", "ARCHIVED"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", containsString("TODO, IN_PROGRESS, DONE")));
+    }
+
+    @Test
+    void getTaskById_returns400_forNonNumericId() throws Exception {
+        mockMvc.perform(get("/api/tasks/abc"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createTask_returns400_forMalformedJson() throws Exception {
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": "))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Malformed or unreadable request body")));
+    }
+
+    @Test
     void getTaskStats_returnsCounts() throws Exception {
         createSampleTask("Task 1", Task.Priority.LOW, Task.Status.TODO);
         createSampleTask("Task 2", Task.Priority.MEDIUM, Task.Status.IN_PROGRESS);

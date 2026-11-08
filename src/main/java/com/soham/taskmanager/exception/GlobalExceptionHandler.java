@@ -2,10 +2,12 @@ package com.soham.taskmanager.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -52,6 +54,35 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
         return buildError(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
+    }
+
+    /**
+     * Handle path/query parameters that cannot be converted to the expected type (400),
+     * e.g. {@code /api/tasks/abc} or {@code ?status=UNKNOWN}.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = "Invalid value '" + ex.getValue() + "' for parameter '" + ex.getName() + "'";
+        Class<?> requiredType = ex.getRequiredType();
+        if (requiredType != null && requiredType.isEnum()) {
+            StringBuilder allowed = new StringBuilder();
+            for (Object constant : requiredType.getEnumConstants()) {
+                if (allowed.length() > 0) {
+                    allowed.append(", ");
+                }
+                allowed.append(constant);
+            }
+            message += ". Must be one of: " + allowed;
+        }
+        return buildError(HttpStatus.BAD_REQUEST, "Bad Request", message);
+    }
+
+    /**
+     * Handle malformed or unreadable JSON request bodies (400).
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadableBody(HttpMessageNotReadableException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, "Bad Request", "Malformed or unreadable request body");
     }
 
     /**
