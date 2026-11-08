@@ -13,8 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * REST controller exposing Task management endpoints.
@@ -24,6 +24,13 @@ import java.util.Map;
 @RequestMapping("/api/tasks")
     
 public class TaskController {
+
+    /** Fields clients are allowed to sort by; anything else is rejected with 400. */
+    static final Set<String> ALLOWED_SORT_FIELDS =
+            Set.of("createdAt", "updatedAt", "dueDate", "priority", "status", "title");
+
+    /** Upper bound on page size to keep responses small. */
+    static final int MAX_PAGE_SIZE = 100;
 
     private final TaskService taskService;
     
@@ -59,6 +66,20 @@ public class TaskController {
             @RequestParam(defaultValue = "6") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
+
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new IllegalArgumentException("Invalid sortBy: " + sortBy +
+                    ". Must be one of: " + String.join(", ", ALLOWED_SORT_FIELDS.stream().sorted().toList()));
+        }
+        if (!sortDir.equalsIgnoreCase("asc") && !sortDir.equalsIgnoreCase("desc")) {
+            throw new IllegalArgumentException("Invalid sortDir: " + sortDir + ". Must be asc or desc");
+        }
+        if (page < 0) {
+            throw new IllegalArgumentException("page must be 0 or greater");
+        }
+        if (size < 1 || size > MAX_PAGE_SIZE) {
+            throw new IllegalArgumentException("size must be between 1 and " + MAX_PAGE_SIZE);
+        }
 
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()

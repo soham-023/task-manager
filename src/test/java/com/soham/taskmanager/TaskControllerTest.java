@@ -181,6 +181,29 @@ class TaskControllerTest {
     }
 
     @Test
+    void getAllTasks_returns400_forUnknownSortField() throws Exception {
+        mockMvc.perform(get("/api/tasks").param("sortBy", "notAField"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", containsString("Invalid sortBy")));
+    }
+
+    @Test
+    void getAllTasks_returns400_forInvalidSortDirection() throws Exception {
+        mockMvc.perform(get("/api/tasks").param("sortDir", "sideways"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllTasks_returns400_forOutOfRangePageSize() throws Exception {
+        mockMvc.perform(get("/api/tasks").param("size", "0"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/tasks").param("size", "1000"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/tasks").param("page", "-1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getTaskStats_returnsCounts() throws Exception {
         createSampleTask("Task 1", Task.Priority.LOW, Task.Status.TODO);
         createSampleTask("Task 2", Task.Priority.MEDIUM, Task.Status.IN_PROGRESS);
