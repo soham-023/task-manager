@@ -14,7 +14,7 @@ A clean, modern, and well-structured task management application built with **Sp
 - **Clean Layered Architecture**: Controller → Service → Repository → Model with DTO validation and centralized error handling.
 - **Embedded Database**: H2 in-memory SQL database with web console enabled for easy inspection.
 - **Responsive UI**: Pure CSS (no heavy framework dependencies), modern cards, modal dialogs, and toast notifications.
-- **Comprehensive Automated Tests**: 14 Spring Boot integration tests verifying all REST endpoints and edge cases.
+- **Comprehensive Automated Tests**: Spring Boot integration tests for every REST endpoint plus fast Mockito unit tests for the service layer, run on every push by GitHub Actions CI.
 
 ---
 
@@ -59,7 +59,9 @@ taskmanager/
 │   │           └── js/
 │   │               └── app.js                      # REST API client & UI bindings
 │   └── test/java/com/soham/taskmanager/
-│       └── TaskControllerTest.java                 # Integration test suite (13 tests)
+│       ├── TaskControllerTest.java                 # REST API integration tests (MockMvc)
+│       └── service/
+│           └── TaskServiceTest.java                # Service-layer unit tests (Mockito)
 ```
 
 ---
@@ -86,7 +88,7 @@ mvn spring-boot:run
   - **Password**: *(leave blank)*
 
 ### 3. Run Automated Tests
-Execute the integration test suite:
+Execute the full test suite (integration + unit tests):
 
 ```bash
 mvn test
@@ -98,12 +100,28 @@ mvn test
 
 | Method | Endpoint | Description | Query Parameters |
 |---|---|---|---|
-| `GET` | `/api/tasks` | Fetch tasks | `status`, `priority`, `search` |
+| `GET` | `/api/tasks` | Fetch a page of tasks | `status`, `priority`, `category`, `search`, `page`, `size`, `sortBy`, `sortDir` |
+| `GET` | `/api/tasks/stats` | Dashboard counts: `total`, `todo`, `inProgress`, `done`, `overdue` | - |
 | `GET` | `/api/tasks/{id}` | Fetch a single task by ID | - |
 | `POST` | `/api/tasks` | Create a new task | - |
 | `PUT` | `/api/tasks/{id}` | Update an existing task | - |
 | `DELETE` | `/api/tasks/{id}` | Delete a task by ID | - |
 | `PATCH` | `/api/tasks/{id}/status`| Quick status update | - |
+
+### Query Parameters for `GET /api/tasks`
+
+| Parameter | Allowed values | Default |
+|---|---|---|
+| `status` | `TODO`, `IN_PROGRESS`, `DONE` | all |
+| `priority` | `LOW`, `MEDIUM`, `HIGH` | all |
+| `category` | `WORK`, `PERSONAL`, `STUDY`, `FINANCE`, `OTHER` | all |
+| `search` | case-insensitive keyword matched against the title (overrides the filters above) | - |
+| `page` | 0-indexed page number, `>= 0` | `0` |
+| `size` | page size, `1`–`100` | `6` |
+| `sortBy` | `createdAt`, `updatedAt`, `dueDate`, `priority`, `status`, `title` | `createdAt` |
+| `sortDir` | `asc`, `desc` | `desc` |
+
+The response is a Spring Data page: tasks are in `content`, with `totalElements`, `totalPages` and `number` (current page).
 
 ### Example Payload (`POST /api/tasks`)
 
@@ -112,6 +130,46 @@ mvn test
   "title": "Build user authentication",
   "description": "Implement JWT-based authentication in Spring Boot",
   "priority": "HIGH",
-  "status": "TODO"
+  "status": "TODO",
+  "category": "WORK",
+  "dueDate": "2026-12-01"
 }
 ```
+
+`title` is required (max 100 chars); `description` is optional (max 500 chars). `priority`, `status` and `category` default to `MEDIUM`, `TODO` and `OTHER`.
+
+### Example Requests
+
+```bash
+# Create a task
+curl -X POST http://localhost:8080/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Write report", "priority": "HIGH", "dueDate": "2026-12-01"}'
+
+# High-priority work tasks, earliest due date first, 10 per page
+curl "http://localhost:8080/api/tasks?priority=HIGH&category=WORK&sortBy=dueDate&sortDir=asc&size=10"
+
+# Mark task 1 as done
+curl -X PATCH http://localhost:8080/api/tasks/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "DONE"}'
+```
+
+### Error Responses
+
+Errors are returned as JSON with a consistent shape:
+
+```json
+{
+  "timestamp": "2026-11-08T22:30:00.123",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Task not found with id: 42"
+}
+```
+
+| Status | When |
+|---|---|
+| `400` | Validation failure (with a `fieldErrors` map), malformed JSON, unknown enum value, or invalid paging/sorting parameter |
+| `404` | No task exists with the given ID |
+| `500` | Unexpected server error |
