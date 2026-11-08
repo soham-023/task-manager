@@ -9,50 +9,39 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
 /**
  * Global exception handler that catches exceptions thrown by controllers
  * and returns consistent, structured JSON error responses.
+ *
+ * <p>Every error body contains {@code timestamp}, {@code status} and {@code error};
+ * most also carry a human-readable {@code message}.</p>
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    
-    
 
     /**
      * Handle resource not found (404).
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
-        
-        
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now().toString());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-        
+        return buildError(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
     }
 
     /**
      * Handle validation errors (400) — returns field-level error messages.
      */
-    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        
         Map<String, String> fieldErrors = new HashMap<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             fieldErrors.put(error.getField(), error.getDefaultMessage());
         }
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now().toString());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Validation Failed");
+        Map<String, Object> body = baseBody(HttpStatus.BAD_REQUEST, "Validation Failed");
         body.put("fieldErrors", fieldErrors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
@@ -62,13 +51,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now().toString());
-        
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return buildError(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
     }
 
     /**
@@ -76,13 +59,23 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
-        Map<String, Object> body = new HashMap<>();
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
+                "An unexpected error occurred");
+    }
+
+    // --- Helpers ---
+
+    private static Map<String, Object> baseBody(HttpStatus status, String error) {
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        
-        body.put("error", "Internal Server Error");
-        
-        body.put("message", "An unexpected error occurred");
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        body.put("status", status.value());
+        body.put("error", error);
+        return body;
+    }
+
+    private static ResponseEntity<Map<String, Object>> buildError(HttpStatus status, String error, String message) {
+        Map<String, Object> body = baseBody(status, error);
+        body.put("message", message);
+        return new ResponseEntity<>(body, status);
     }
 }
