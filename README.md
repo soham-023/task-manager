@@ -136,7 +136,7 @@ The response is a Spring Data page: tasks are in `content`, with `totalElements`
 }
 ```
 
-`title` is required (max 100 chars); `description` is optional (max 500 chars). `priority`, `status` and `category` default to `MEDIUM`, `TODO` and `OTHER`.
+`title` is required (max 100 chars); `description` is optional (max 500 chars). `priority`, `status` and `category` default to `MEDIUM`, `TODO` and `OTHER`. A new task's `dueDate` must be today or later; updates may keep a date that has since passed.
 
 ### Example Requests
 

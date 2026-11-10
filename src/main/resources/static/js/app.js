@@ -344,6 +344,8 @@ function openNewModal() {
     inputStatus.value = 'TODO';
     inputCategory.value = 'OTHER';
     inputDueDate.value = '';
+    // New tasks cannot be due in the past (the API rejects them); edits may keep an overdue date.
+    inputDueDate.min = toIsoDate(new Date());
     titleChars.textContent = '0';
     descChars.textContent = '0';
     document.getElementById('btn-save').textContent = 'Save Task';
@@ -360,6 +362,7 @@ function openEditModal(task) {
     inputStatus.value = task.status;
     inputCategory.value = task.category || 'OTHER';
     inputDueDate.value = task.dueDate || '';
+    inputDueDate.removeAttribute('min');
     titleChars.textContent = task.title.length;
     descChars.textContent = (task.description || '').length;
     document.getElementById('btn-save').textContent = 'Update Task';
@@ -392,6 +395,12 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+/** Format a Date as YYYY-MM-DD in local time (toISOString would use UTC). */
+function toIsoDate(date) {
+    const pad = n => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
 function formatStatus(status) {

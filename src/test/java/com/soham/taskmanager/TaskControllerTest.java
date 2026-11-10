@@ -320,6 +320,17 @@ class TaskControllerTest {
     }
 
     @Test
+    void createTask_returns400_whenDueDateInPast() throws Exception {
+        Task late = new Task("Late", null, Task.Priority.LOW, Task.Status.TODO, LocalDate.now().minusDays(3));
+
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(late)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Due date cannot be in the past")));
+    }
+
+    @Test
     void createTask_withCategory_returnsCreatedTaskWithCategory() throws Exception {
         Task newTask = new Task("Study Spring", "Learn Spring Boot 3", Task.Priority.MEDIUM, Task.Status.TODO, null, Task.Category.STUDY);
 

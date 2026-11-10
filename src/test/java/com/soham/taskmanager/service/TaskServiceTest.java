@@ -47,6 +47,22 @@ class TaskServiceTest {
     }
 
     @Test
+    void createTask_rejectsDueDateInThePast_withoutSaving() {
+        Task t = new Task("Late", null, Task.Priority.LOW, Task.Status.TODO, LocalDate.now().minusDays(1));
+
+        assertThrows(IllegalArgumentException.class, () -> taskService.createTask(t));
+        verify(taskRepository, never()).save(any());
+    }
+
+    @Test
+    void createTask_acceptsDueDateToday() {
+        Task t = new Task("Today", null, Task.Priority.LOW, Task.Status.TODO, LocalDate.now());
+        when(taskRepository.save(t)).thenReturn(t);
+
+        assertSame(t, taskService.createTask(t));
+    }
+
+    @Test
     void getTaskById_returnsTask_whenPresent() {
         Task existing = task(1L, "Existing");
         when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));

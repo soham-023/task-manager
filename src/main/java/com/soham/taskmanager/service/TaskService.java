@@ -66,8 +66,15 @@ public class TaskService {
 
     /**
      * Create a new task.
+     *
+     * @throws IllegalArgumentException if the due date is already in the past
      */
     public Task createTask(Task task) {
+        // Only new tasks are checked: an existing task may legitimately become
+        // overdue and still needs to be editable.
+        if (task.getDueDate() != null && task.getDueDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Due date cannot be in the past");
+        }
         return taskRepository.save(task);
     }
 
