@@ -6,6 +6,7 @@ import com.soham.taskmanager.repository.TaskRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -15,8 +16,12 @@ import java.util.Map;
 /**
  * Service layer containing business logic for Task operations.
  * Acts as an intermediary between the controller and repository.
+ *
+ * <p>Methods are read-only transactional by default; methods that modify data
+ * override this so a read-then-write (e.g. load, then update) runs in one transaction.</p>
  */
 @Service
+@Transactional(readOnly = true)
 public class TaskService {
 
     private final TaskRepository taskRepository;
@@ -60,6 +65,7 @@ public class TaskService {
      *
      * @throws IllegalArgumentException if the due date is already in the past
      */
+    @Transactional
     public Task createTask(Task task) {
         // Only new tasks are checked: an existing task may legitimately become
         // overdue and still needs to be editable.
@@ -74,6 +80,7 @@ public class TaskService {
      *
      * @throws ResourceNotFoundException if no task exists with the given ID
      */
+    @Transactional
     public Task updateTask(Long id, Task updatedTask) {
         Task existing = getTaskById(id);
         existing.setTitle(updatedTask.getTitle());
@@ -90,6 +97,7 @@ public class TaskService {
      *
      * @throws ResourceNotFoundException if no task exists with the given ID
      */
+    @Transactional
     public void deleteTask(Long id) {
         Task existing = getTaskById(id);
         taskRepository.delete(existing);
@@ -100,6 +108,7 @@ public class TaskService {
      *
      * @throws ResourceNotFoundException if no task exists with the given ID
      */
+    @Transactional
     public Task updateTaskStatus(Long id, Task.Status status) {
         Task existing = getTaskById(id);
         existing.setStatus(status);
