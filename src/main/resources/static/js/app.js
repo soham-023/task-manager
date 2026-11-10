@@ -388,10 +388,14 @@ function closeModal() {
 // Toast Notification
 // ==========================================
 
+let toastTimeout = null;
+
 function showToast(message, type = 'success') {
     toastEl.textContent = message;
     toastEl.className = `toast ${type} show`;
-    setTimeout(() => {
+    // Restart the timer so a new toast is not hidden early by the previous one's timeout.
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
         toastEl.classList.remove('show');
     }, 2500);
 }
