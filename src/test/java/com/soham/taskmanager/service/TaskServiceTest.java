@@ -9,6 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -143,21 +147,21 @@ class TaskServiceTest {
     }
 
     @Test
-    void getAllTasks_withoutFilters_returnsFindAll() {
-        List<Task> all = List.of(task(1L, "a"), task(2L, "b"));
-        when(taskRepository.findAll()).thenReturn(all);
+    void getAllTasks_delegatesFiltersAndPageableToRepository() {
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Task> page = new PageImpl<>(List.of(task(1L, "a")), pageable, 1);
+        when(taskRepository.findWithFilters(null, Task.Priority.HIGH, Task.Category.WORK, pageable)).thenReturn(page);
 
-        assertEquals(all, taskService.getAllTasks(null, null, null));
-        verify(taskRepository, never()).findWithFilters(any(), any(), any());
+        assertSame(page, taskService.getAllTasks(null, Task.Priority.HIGH, Task.Category.WORK, pageable));
     }
 
     @Test
-    void getAllTasks_withFilter_delegatesToFilterQuery() {
-        List<Task> high = List.of(task(1L, "a"));
-        when(taskRepository.findWithFilters(null, Task.Priority.HIGH, null)).thenReturn(high);
+    void searchTasks_delegatesKeywordAndPageableToRepository() {
+        Pageable pageable = PageRequest.of(1, 3);
+        Page<Task> page = new PageImpl<>(List.of(), pageable, 0);
+        when(taskRepository.searchByTitle("report", pageable)).thenReturn(page);
 
-        assertEquals(high, taskService.getAllTasks(null, Task.Priority.HIGH, null));
-        verify(taskRepository, never()).findAll();
+        assertSame(page, taskService.searchTasks("report", pageable));
     }
 
     @Test

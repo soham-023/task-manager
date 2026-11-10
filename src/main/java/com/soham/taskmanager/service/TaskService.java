@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -33,25 +32,6 @@ public class TaskService {
     public Page<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category, Pageable pageable) {
         
         return taskRepository.findWithFilters(status, priority, category, pageable);
-    }
-
-    /**
-     * Retrieve all tasks, optionally filtered by status, priority, and/or category.
-     */
-    public List<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category) {
-        
-        if (status != null || priority != null || category != null) {
-            return taskRepository.findWithFilters(status, priority, category);
-        }
-        return taskRepository.findAll();
-    }
-
-    /**
-     * Retrieve all tasks, optionally filtered by status and/or priority.
-     */
-    public List<Task> getAllTasks(Task.Status status, Task.Priority priority) {
-        return getAllTasks(status, priority, null);
-        
     }
 
     /**
@@ -114,13 +94,6 @@ public class TaskService {
         existing.setStatus(status);
         return taskRepository.save(existing);
         
-    }
-
-    /**
-     * Search tasks by title keyword (case-insensitive).
-     */
-    public List<Task> searchTasks(String keyword) {
-        return taskRepository.searchByTitle(keyword);
     }
 
     /**
