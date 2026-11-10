@@ -1,5 +1,6 @@
 package com.soham.taskmanager.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -66,18 +69,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        String message = "Invalid value '" + ex.getValue() + "' for parameter '" + ex.getName() + "'";
-        Class<?> requiredType = ex.getRequiredType();
-        if (requiredType != null && requiredType.isEnum()) {
-            StringBuilder allowed = new StringBuilder();
-            for (Object constant : requiredType.getEnumConstants()) {
-                if (allowed.length() > 0) {
-                    allowed.append(", ");
-                }
-                allowed.append(constant);
-            }
-            message += ". Must be one of: " + allowed;
-        }
+        String message = "Invalid value '" + ex.getValue() + "' for parameter '" + ex.getName() + "'"
+                + allowedValuesSuffix(ex.getRequiredType());
         return buildError(HttpStatus.BAD_REQUEST, "Bad Request", message);
     }
 
@@ -86,6 +79,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleUnreadableBody(HttpMessageNotReadableException ex) {
+        // Well-formed JSON with a value of the wrong type (e.g. "priority": "URGENT")
+        // gets a message naming the field and, for enums, the accepted values.
+        if (ex.getCause() instanceof InvalidFormatException invalid && !invalid.getPath().isEmpty()) {
+            String field = invalid.getPath().get(invalid.getPath().size() - 1).getFieldName();
+            String message = "Invalid value '" + invalid.getValue() + "' for field '" + field + "'"
+                    + allowedValuesSuffix(invalid.getTargetType());
+            return buildError(HttpStatus.BAD_REQUEST, "Bad Request", message);
+        }
         return buildError(HttpStatus.BAD_REQUEST, "Bad Request", "Malformed or unreadable request body");
     }
 
@@ -102,6 +103,16 @@ public class GlobalExceptionHandler {
     }
 
     // --- Helpers ---
+
+    /** For enum types, returns ". Must be one of: A, B, C"; otherwise an empty string. */
+    private static String allowedValuesSuffix(Class<?> type) {
+        if (type == null || !type.isEnum()) {
+            return "";
+        }
+        return ". Must be one of: " + Arrays.stream(type.getEnumConstants())
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
+    }
 
     private static Map<String, Object> baseBody(HttpStatus status, String error) {
         Map<String, Object> body = new LinkedHashMap<>();

@@ -256,6 +256,16 @@ class TaskControllerTest {
     }
 
     @Test
+    void createTask_returns400_namingFieldAndAllowedValues_forUnknownEnumValue() throws Exception {
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": \"Bad\", \"priority\": \"URGENT\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message",
+                        is("Invalid value 'URGENT' for field 'priority'. Must be one of: LOW, MEDIUM, HIGH")));
+    }
+
+    @Test
     void getTaskStats_returnsCounts() throws Exception {
         createSampleTask("Task 1", Task.Priority.LOW, Task.Status.TODO);
         createSampleTask("Task 2", Task.Priority.MEDIUM, Task.Status.IN_PROGRESS);
