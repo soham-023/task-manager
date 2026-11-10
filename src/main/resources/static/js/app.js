@@ -204,7 +204,7 @@ function renderTasks(tasks) {
 
         card.innerHTML = `
             <div class="task-checkbox">
-                <input type="checkbox" ${isChecked} title="Toggle done" />
+                <input type="checkbox" ${isChecked} title="Toggle done" aria-label="Mark &quot;${escapeHtml(task.title)}&quot; as done" />
             </div>
             <div class="task-body">
                 <div class="task-title">${escapeHtml(task.title)}</div>
@@ -218,8 +218,8 @@ function renderTasks(tasks) {
                 </div>
             </div>
             <div class="task-actions">
-                <button class="btn-icon" title="Edit" data-action="edit">✏️</button>
-                <button class="btn-icon" title="Delete" data-action="delete">🗑️</button>
+                <button type="button" class="btn-icon" title="Edit" data-action="edit" aria-label="Edit &quot;${escapeHtml(task.title)}&quot;">✏️</button>
+                <button type="button" class="btn-icon" title="Delete" data-action="delete" aria-label="Delete &quot;${escapeHtml(task.title)}&quot;">🗑️</button>
             </div>
         `;
 
@@ -275,6 +275,8 @@ function renderPagination(pageData) {
         btn.className = `page-num-btn ${i === currentPage ? 'active' : ''}`;
         btn.textContent = i + 1;
         btn.title = `Go to page ${i + 1}`;
+        btn.setAttribute('aria-label', `Page ${i + 1}`);
+        if (i === currentPage) btn.setAttribute('aria-current', 'page');
         btn.addEventListener('click', () => {
             if (i !== currentPage) {
                 currentPage = i;

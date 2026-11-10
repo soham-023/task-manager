@@ -18,22 +18,22 @@
     <!-- Toolbar: Search & Filters -->
     <section class="toolbar">
         <div class="search-box">
-            <input type="text" id="search-input" placeholder="Search tasks by title..." />
+            <input type="search" id="search-input" placeholder="Search tasks by title..." aria-label="Search tasks by title" />
         </div>
         <div class="filters">
-            <select id="filter-status">
+            <select id="filter-status" aria-label="Filter by status">
                 <option value="">All Statuses</option>
                 <option value="TODO">To Do</option>
                 <option value="IN_PROGRESS">In Progress</option>
                 <option value="DONE">Done</option>
             </select>
-            <select id="filter-priority">
+            <select id="filter-priority" aria-label="Filter by priority">
                 <option value="">All Priorities</option>
                 <option value="LOW">Low</option>
                 <option value="MEDIUM">Medium</option>
                 <option value="HIGH">High</option>
             </select>
-            <select id="filter-category">
+            <select id="filter-category" aria-label="Filter by category">
                 <option value="">All Categories</option>
                 <option value="WORK">💼 Work</option>
                 <option value="PERSONAL">🏠 Personal</option>
@@ -41,7 +41,7 @@
                 <option value="FINANCE">💰 Finance</option>
                 <option value="OTHER">📌 Other</option>
             </select>
-            <select id="sort-by">
+            <select id="sort-by" aria-label="Sort tasks">
                 <option value="createdAt,desc">🕒 Newest First</option>
                 <option value="createdAt,asc">🕒 Oldest First</option>
                 <option value="dueDate,asc">📅 Due Date (Earliest)</option>
@@ -54,7 +54,7 @@
     </section>
 
     <!-- Stats Bar -->
-    <section class="stats-bar">
+    <section class="stats-bar" aria-label="Task statistics">
         <div class="stat">
             <span class="stat-count" id="stat-total">0</span>
             <span class="stat-label">Total</span>
@@ -78,19 +78,19 @@
     </section>
 
     <!-- Task List -->
-    <main class="task-list" id="task-list">
+    <main class="task-list" id="task-list" aria-label="Tasks">
         <!-- Task cards are rendered dynamically by app.js -->
     </main>
 
     <!-- Empty State -->
     <div class="empty-state" id="empty-state" style="display: none;">
-        <span class="empty-icon">📭</span>
+        <span class="empty-icon" aria-hidden="true">📭</span>
         <h2>No tasks found</h2>
         <p>Click "+ New Task" to create your first task.</p>
     </div>
 
     <!-- Pagination -->
-    <section class="pagination-bar" id="pagination-bar" style="display: none;">
+    <nav class="pagination-bar" id="pagination-bar" style="display: none;" aria-label="Pagination">
         <button id="btn-prev-page" class="btn btn-secondary btn-page" disabled>&larr; Prev</button>
         <div class="page-numbers" id="page-numbers"></div>
         <button id="btn-next-page" class="btn btn-secondary btn-page" disabled>Next &rarr;</button>
@@ -102,14 +102,14 @@
                 <option value="10">10</option>
             </select>
         </div>
-    </section>
+    </nav>
 
     <!-- Modal: Create / Edit Task -->
     <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <div class="modal-header">
                 <h2 id="modal-title">New Task</h2>
-                <button class="btn-close" id="btn-close-modal">&times;</button>
+                <button type="button" class="btn-close" id="btn-close-modal" aria-label="Close dialog">&times;</button>
             </div>
             <form id="task-form">
                 <div class="form-group">
@@ -165,7 +165,7 @@
     </div>
 
     <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script src="/js/app.js"></script>
 </body>
