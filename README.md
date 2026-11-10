@@ -63,6 +63,8 @@ taskmanager/
 │   │               └── app.js                      # REST API client & UI bindings
 │   └── test/java/com/soham/taskmanager/
 │       ├── TaskControllerTest.java                 # REST API integration tests (MockMvc)
+│       ├── repository/
+│       │   └── TaskRepositoryTest.java             # JPQL query tests (@DataJpaTest, H2)
 │       └── service/
 │           └── TaskServiceTest.java                # Service-layer unit tests (Mockito)
 ```
