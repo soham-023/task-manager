@@ -118,8 +118,8 @@ public class Task {
     public Task(String title, String description, Priority priority, Status status, LocalDate dueDate, Category category) {
         this.title = title;
         this.description = description;
-        this.priority = priority;
-        this.status = status;
+        this.priority = (priority != null) ? priority : Priority.MEDIUM;
+        this.status = (status != null) ? status : Status.TODO;
         this.dueDate = dueDate;
         this.category = (category != null) ? category : Category.OTHER;
     }
@@ -155,16 +155,23 @@ public class Task {
         return priority;
     }
 
+    /**
+     * Sets the priority; {@code null} falls back to {@link Priority#MEDIUM} so an explicit
+     * JSON {@code null} cannot violate the NOT NULL column.
+     */
     public void setPriority(Priority priority) {
-        this.priority = priority;
+        this.priority = (priority != null) ? priority : Priority.MEDIUM;
     }
 
     public Status getStatus() {
         return status;
     }
 
+    /**
+     * Sets the status; {@code null} falls back to {@link Status#TODO}.
+     */
     public void setStatus(Status status) {
-        this.status = status;
+        this.status = (status != null) ? status : Status.TODO;
     }
 
     public LocalDateTime getCreatedAt() {

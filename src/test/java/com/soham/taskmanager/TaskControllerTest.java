@@ -291,6 +291,17 @@ class TaskControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void createTask_appliesDefaults_whenPriorityAndStatusAreExplicitlyNull() throws Exception {
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": \"Nulls\", \"priority\": null, \"status\": null, \"category\": null}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.priority", is("MEDIUM")))
+                .andExpect(jsonPath("$.status", is("TODO")))
+                .andExpect(jsonPath("$.category", is("OTHER")));
+    }
+
     // ==========================================
     // PUT /api/tasks/{id}
     // ==========================================
