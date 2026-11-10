@@ -1,0 +1,8 @@
+# Keep the build context small and avoid leaking local build output
+target/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
+*.log

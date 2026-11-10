@@ -34,6 +34,7 @@ A clean, modern, and well-structured task management application built with **Sp
 ```
 taskmanager/
 ├── pom.xml
+├── Dockerfile                                 # Multi-stage image build
 ├── README.md
 ├── src/
 │   ├── main/
@@ -91,6 +92,16 @@ mvn spring-boot:run
   - **JDBC URL**: `jdbc:h2:mem:taskdb`
   - **User Name**: `sa`
   - **Password**: *(leave blank)*
+
+### Run with Docker
+Build the image (Maven runs inside the build stage, so no local JDK is needed) and start it:
+
+```bash
+docker build -t task-manager .
+docker run --rm -p 8080:8080 task-manager
+```
+
+The app is then available at [http://localhost:8080](http://localhost:8080). Data lives in the in-memory H2 database, so it resets when the container stops.
 
 ### 3. Run Automated Tests
 Execute the full test suite (integration + unit tests):
