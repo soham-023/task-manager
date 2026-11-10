@@ -20,13 +20,14 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     /**
      * Paged, sortable query combining the optional filters. Every argument may be
      * {@code null} to skip that criterion; {@code keyword} is a case-insensitive
-     * partial match against the title.
+     * partial match against the title, with {@code !} as the LIKE escape character
+     * (see {@code TaskService#escapeLikePattern}).
      */
     @Query("SELECT t FROM Task t WHERE " +
            "(:status IS NULL OR t.status = :status) AND " +
            "(:priority IS NULL OR t.priority = :priority) AND " +
            "(:category IS NULL OR t.category = :category) AND " +
-           "(:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+           "(:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!')")
     Page<Task> findWithFilters(@Param("status") Task.Status status,
                                @Param("priority") Task.Priority priority,
                                @Param("category") Task.Category category,

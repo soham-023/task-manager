@@ -32,8 +32,17 @@ public class TaskService {
      */
     public Page<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category,
                                   String keyword, Pageable pageable) {
-        String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : escapeLikePattern(keyword.trim());
         return taskRepository.findWithFilters(status, priority, category, normalizedKeyword, pageable);
+    }
+
+    /**
+     * Escape LIKE wildcards so a user's {@code %} or {@code _} is matched literally
+     * instead of acting as a pattern. Uses {@code !} as the escape character, matching
+     * the {@code ESCAPE '!'} clause in {@link TaskRepository#findWithFilters}.
+     */
+    static String escapeLikePattern(String keyword) {
+        return keyword.replace("!", "!!").replace("%", "!%").replace("_", "!_");
     }
 
     /**

@@ -135,6 +135,24 @@ class TaskControllerTest {
     }
 
     @Test
+    void getAllTasks_searchTreatsWildcardsLiterally() throws Exception {
+        createSampleTask("Reach 100% coverage", Task.Priority.HIGH, Task.Status.TODO);
+        createSampleTask("Run 1000 iterations", Task.Priority.LOW, Task.Status.TODO);
+        createSampleTask("Rename my_var", Task.Priority.LOW, Task.Status.TODO);
+        createSampleTask("Rename myXvar", Task.Priority.LOW, Task.Status.TODO);
+
+        mockMvc.perform(get("/api/tasks").param("search", "100%"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title", is("Reach 100% coverage")));
+
+        mockMvc.perform(get("/api/tasks").param("search", "my_var"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title", is("Rename my_var")));
+    }
+
+    @Test
     void getAllTasks_filterByCategory() throws Exception {
         Task t1 = new Task("Work Task", "Desc", Task.Priority.HIGH, Task.Status.TODO, null, Task.Category.WORK);
         Task t2 = new Task("Personal Task", "Desc", Task.Priority.LOW, Task.Status.TODO, null, Task.Category.PERSONAL);

@@ -167,6 +167,14 @@ class TaskServiceTest {
     }
 
     @Test
+    void escapeLikePattern_escapesWildcardsAndEscapeCharacter() {
+        assertEquals("100!% done", TaskService.escapeLikePattern("100% done"));
+        assertEquals("snake!_case", TaskService.escapeLikePattern("snake_case"));
+        assertEquals("wow!!", TaskService.escapeLikePattern("wow!"));
+        assertEquals("plain", TaskService.escapeLikePattern("plain"));
+    }
+
+    @Test
     void getTaskStats_aggregatesRepositoryCounts() {
         when(taskRepository.count()).thenReturn(10L);
         when(taskRepository.countByStatus(Task.Status.TODO)).thenReturn(4L);
