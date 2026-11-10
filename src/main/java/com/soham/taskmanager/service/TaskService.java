@@ -27,11 +27,13 @@ public class TaskService {
     }
 
     /**
-     * Retrieve tasks with pagination, sorting, and optional filtering by status, priority, and/or category.
+     * Retrieve a page of tasks, optionally filtered by status, priority, category and a
+     * title keyword. Any criterion may be {@code null}; a blank keyword is ignored.
      */
-    public Page<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category, Pageable pageable) {
-        
-        return taskRepository.findWithFilters(status, priority, category, pageable);
+    public Page<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category,
+                                  String keyword, Pageable pageable) {
+        String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        return taskRepository.findWithFilters(status, priority, category, normalizedKeyword, pageable);
     }
 
     /**
@@ -94,13 +96,6 @@ public class TaskService {
         existing.setStatus(status);
         return taskRepository.save(existing);
         
-    }
-
-    /**
-     * Search tasks by title keyword with pagination.
-     */
-    public Page<Task> searchTasks(String keyword, Pageable pageable) {
-        return taskRepository.searchByTitle(keyword, pageable);
     }
 
     /**

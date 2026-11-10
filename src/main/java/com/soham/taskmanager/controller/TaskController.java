@@ -48,7 +48,7 @@ public class TaskController {
      *   - status:   TODO | IN_PROGRESS | DONE
      *   - priority: LOW | MEDIUM | HIGH
      *   - category: WORK | PERSONAL | STUDY | FINANCE | OTHER
-     *   - search:   keyword to search titles
+     *   - search:   keyword to search titles (combined with the filters above)
      *   - page:     0-indexed page number (default 0)
      *   - size:     page size (default 6)
      *   - sortBy:   createdAt | dueDate | priority | title (default "createdAt")
@@ -88,13 +88,7 @@ public class TaskController {
         Pageable pageable = PageRequest.of(page, size, sort);
         
 
-        Page<Task> tasks;
-        if (search != null && !search.isBlank()) {
-            tasks = taskService.searchTasks(search.trim(), pageable);
-        } else {
-            tasks = taskService.getAllTasks(status, priority, category, pageable);
-            
-        }
+        Page<Task> tasks = taskService.getAllTasks(status, priority, category, search, pageable);
         return ResponseEntity.ok(tasks);
     }
 

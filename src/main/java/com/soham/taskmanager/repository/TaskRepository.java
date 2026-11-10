@@ -18,22 +18,20 @@ import java.time.LocalDate;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     /**
-     * Flexible multi-criteria filter query with pagination and sorting.
+     * Paged, sortable query combining the optional filters. Every argument may be
+     * {@code null} to skip that criterion; {@code keyword} is a case-insensitive
+     * partial match against the title.
      */
     @Query("SELECT t FROM Task t WHERE " +
            "(:status IS NULL OR t.status = :status) AND " +
            "(:priority IS NULL OR t.priority = :priority) AND " +
-           "(:category IS NULL OR t.category = :category)")
+           "(:category IS NULL OR t.category = :category) AND " +
+           "(:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<Task> findWithFilters(@Param("status") Task.Status status,
                                @Param("priority") Task.Priority priority,
                                @Param("category") Task.Category category,
+                               @Param("keyword") String keyword,
                                Pageable pageable);
-
-    /**
-     * Search tasks by title (case-insensitive, partial match) with pagination.
-     */
-    @Query("SELECT t FROM Task t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Page<Task> searchByTitle(@Param("keyword") String keyword, Pageable pageable);
 
     /**
      * Count tasks by status for dashboard statistics.

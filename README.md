@@ -115,7 +115,7 @@ mvn test
 | `status` | `TODO`, `IN_PROGRESS`, `DONE` | all |
 | `priority` | `LOW`, `MEDIUM`, `HIGH` | all |
 | `category` | `WORK`, `PERSONAL`, `STUDY`, `FINANCE`, `OTHER` | all |
-| `search` | case-insensitive keyword matched against the title (overrides the filters above) | - |
+| `search` | case-insensitive keyword matched against the title (combined with the filters above) | - |
 | `page` | 0-indexed page number, `>= 0` | `0` |
 | `size` | page size, `1`–`100` | `6` |
 | `sortBy` | `createdAt`, `updatedAt`, `dueDate`, `priority`, `status`, `title` | `createdAt` |

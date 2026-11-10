@@ -150,18 +150,20 @@ class TaskServiceTest {
     void getAllTasks_delegatesFiltersAndPageableToRepository() {
         Pageable pageable = PageRequest.of(0, 5);
         Page<Task> page = new PageImpl<>(List.of(task(1L, "a")), pageable, 1);
-        when(taskRepository.findWithFilters(null, Task.Priority.HIGH, Task.Category.WORK, pageable)).thenReturn(page);
+        when(taskRepository.findWithFilters(null, Task.Priority.HIGH, Task.Category.WORK, null, pageable)).thenReturn(page);
 
-        assertSame(page, taskService.getAllTasks(null, Task.Priority.HIGH, Task.Category.WORK, pageable));
+        assertSame(page, taskService.getAllTasks(null, Task.Priority.HIGH, Task.Category.WORK, null, pageable));
     }
 
     @Test
-    void searchTasks_delegatesKeywordAndPageableToRepository() {
+    void getAllTasks_trimsKeyword_andTreatsBlankAsNoKeyword() {
         Pageable pageable = PageRequest.of(1, 3);
         Page<Task> page = new PageImpl<>(List.of(), pageable, 0);
-        when(taskRepository.searchByTitle("report", pageable)).thenReturn(page);
+        when(taskRepository.findWithFilters(Task.Status.TODO, null, null, "report", pageable)).thenReturn(page);
+        when(taskRepository.findWithFilters(Task.Status.TODO, null, null, null, pageable)).thenReturn(page);
 
-        assertSame(page, taskService.searchTasks("report", pageable));
+        assertSame(page, taskService.getAllTasks(Task.Status.TODO, null, null, "  report ", pageable));
+        assertSame(page, taskService.getAllTasks(Task.Status.TODO, null, null, "   ", pageable));
     }
 
     @Test
