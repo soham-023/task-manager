@@ -1,5 +1,6 @@
 package com.soham.taskmanager.service;
 
+import com.soham.taskmanager.dto.TaskStats;
 import com.soham.taskmanager.exception.ResourceNotFoundException;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.repository.TaskRepository;
@@ -9,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -119,20 +118,12 @@ public class TaskService {
     /**
      * Compute aggregate metrics across all tasks for dashboard statistics.
      */
-    public Map<String, Long> getTaskStats() {
-        Map<String, Long> stats = new HashMap<>();
-        
-        long total = taskRepository.count();
-        long todo = taskRepository.countByStatus(Task.Status.TODO);
-        long inProgress = taskRepository.countByStatus(Task.Status.IN_PROGRESS);
-        long done = taskRepository.countByStatus(Task.Status.DONE);
-        long overdue = taskRepository.countOverdueTasks(LocalDate.now());
-
-        stats.put("total", total);
-        stats.put("todo", todo);
-        stats.put("inProgress", inProgress);
-        stats.put("done", done);
-        stats.put("overdue", overdue);
-        return stats;
+    public TaskStats getTaskStats() {
+        return new TaskStats(
+                taskRepository.count(),
+                taskRepository.countByStatus(Task.Status.TODO),
+                taskRepository.countByStatus(Task.Status.IN_PROGRESS),
+                taskRepository.countByStatus(Task.Status.DONE),
+                taskRepository.countOverdueTasks(LocalDate.now()));
     }
 }

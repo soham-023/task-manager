@@ -1,5 +1,6 @@
 package com.soham.taskmanager.controller;
 
+import com.soham.taskmanager.dto.TaskStats;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
@@ -97,8 +98,7 @@ public class TaskController {
      * Return aggregate task counts (total, todo, inProgress, done, overdue) for the dashboard.
      */
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Long>> getTaskStats() {
-        
+    public ResponseEntity<TaskStats> getTaskStats() {
         return ResponseEntity.ok(taskService.getTaskStats());
     }
 

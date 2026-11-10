@@ -47,6 +47,8 @@ taskmanager/
 │   │   │   │   └── TaskRepository.java            # Spring Data JPA queries
 │   │   │   ├── model/
 │   │   │   │   └── Task.java                      # JPA Entity with Priority/Status enums
+│   │   │   ├── dto/
+│   │   │   │   └── TaskStats.java                 # Dashboard counts returned by /stats
 │   │   │   └── exception/
 │   │   │       ├── ResourceNotFoundException.java  # HTTP 404 handler
 │   │   │       └── GlobalExceptionHandler.java     # Centralized @ControllerAdvice

@@ -1,5 +1,6 @@
 package com.soham.taskmanager.service;
 
+import com.soham.taskmanager.dto.TaskStats;
 import com.soham.taskmanager.exception.ResourceNotFoundException;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.repository.TaskRepository;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -182,12 +182,6 @@ class TaskServiceTest {
         when(taskRepository.countByStatus(Task.Status.DONE)).thenReturn(3L);
         when(taskRepository.countOverdueTasks(any(LocalDate.class))).thenReturn(2L);
 
-        Map<String, Long> stats = taskService.getTaskStats();
-
-        assertEquals(10L, stats.get("total"));
-        assertEquals(4L, stats.get("todo"));
-        assertEquals(3L, stats.get("inProgress"));
-        assertEquals(3L, stats.get("done"));
-        assertEquals(2L, stats.get("overdue"));
+        assertEquals(new TaskStats(10L, 4L, 3L, 3L, 2L), taskService.getTaskStats());
     }
 }
