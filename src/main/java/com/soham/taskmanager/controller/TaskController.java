@@ -1,5 +1,6 @@
 package com.soham.taskmanager.controller;
 
+import com.soham.taskmanager.dto.StatusUpdateRequest;
 import com.soham.taskmanager.dto.TaskStats;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.service.TaskService;
@@ -14,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -154,25 +154,9 @@ public class TaskController {
      */
     @PatchMapping("/{id}/status")
     public ResponseEntity<Task> updateTaskStatus(
-        
             @PathVariable Long id,
-            @RequestBody Map<String, String> body) {
-
-        String statusStr = body.get("status");
-        
-        if (statusStr == null || statusStr.isBlank()) {
-            throw new IllegalArgumentException("Status is required");
-        }
-
-        Task.Status status;
-        try {
-            status = Task.Status.valueOf(statusStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid status: " + statusStr +
-                    ". Must be one of: TODO, IN_PROGRESS, DONE");
-        }
-
-        Task updated = taskService.updateTaskStatus(id, status);
+            @Valid @RequestBody StatusUpdateRequest request) {
+        Task updated = taskService.updateTaskStatus(id, request.status());
         return ResponseEntity.ok(updated);
     }
 }

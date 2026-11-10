@@ -48,6 +48,7 @@ taskmanager/
 │   │   │   ├── model/
 │   │   │   │   └── Task.java                      # JPA Entity with Priority/Status enums
 │   │   │   ├── dto/
+│   │   │   │   ├── StatusUpdateRequest.java       # Validated body for PATCH /status
 │   │   │   │   └── TaskStats.java                 # Dashboard counts returned by /stats
 │   │   │   └── exception/
 │   │   │       ├── ResourceNotFoundException.java  # HTTP 404 handler

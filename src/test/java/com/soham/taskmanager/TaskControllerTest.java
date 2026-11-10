@@ -443,6 +443,29 @@ class TaskControllerTest {
         mockMvc.perform(patch("/api/tasks/" + task.getId() + "/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\": \"INVALID\"}"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", containsString("TODO, IN_PROGRESS, DONE")));
+    }
+
+    @Test
+    void updateTaskStatus_acceptsLowercaseStatus() throws Exception {
+        Task task = createSampleTask("Status Task", Task.Priority.MEDIUM, Task.Status.TODO);
+
+        mockMvc.perform(patch("/api/tasks/" + task.getId() + "/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"in_progress\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is("IN_PROGRESS")));
+    }
+
+    @Test
+    void updateTaskStatus_returns400_whenStatusMissing() throws Exception {
+        Task task = createSampleTask("Status Task", Task.Priority.MEDIUM, Task.Status.TODO);
+
+        mockMvc.perform(patch("/api/tasks/" + task.getId() + "/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.status", is("Status is required")));
     }
 }
