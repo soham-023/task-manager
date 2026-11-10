@@ -58,6 +58,21 @@ let totalPages = 0;
 // API Functions
 // ==========================================
 
+/**
+ * Build a user-facing message from an error response. Uses the API's
+ * fieldErrors or message when the body is JSON, and falls back otherwise
+ * (e.g. an HTML error page from a proxy), so a bad body never masks the error.
+ */
+async function readErrorMessage(res, fallback) {
+    try {
+        const err = await res.json();
+        if (err.fieldErrors) return Object.values(err.fieldErrors).join(', ');
+        return err.message || fallback;
+    } catch {
+        return fallback;
+    }
+}
+
 async function fetchTasks(params = {}) {
     const query = new URLSearchParams();
     if (params.page !== undefined) query.set('page', params.page);
@@ -71,7 +86,7 @@ async function fetchTasks(params = {}) {
 
     const url = query.toString() ? `${API_URL}?${query}` : API_URL;
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch tasks');
+    if (!res.ok) throw new Error(await readErrorMessage(res, 'Failed to fetch tasks'));
     return res.json();
 }
 
@@ -87,10 +102,7 @@ async function createTask(task) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(task),
     });
-    if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.fieldErrors ? Object.values(err.fieldErrors).join(', ') : err.message);
-    }
+    if (!res.ok) throw new Error(await readErrorMessage(res, 'Failed to save task'));
     return res.json();
 }
 
@@ -100,16 +112,13 @@ async function updateTask(id, task) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(task),
     });
-    if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.fieldErrors ? Object.values(err.fieldErrors).join(', ') : err.message);
-    }
+    if (!res.ok) throw new Error(await readErrorMessage(res, 'Failed to save task'));
     return res.json();
 }
 
 async function deleteTask(id) {
     const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to delete task');
+    if (!res.ok) throw new Error(await readErrorMessage(res, 'Failed to delete task'));
 }
 
 async function updateTaskStatus(id, status) {
@@ -118,7 +127,7 @@ async function updateTaskStatus(id, status) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
     });
-    if (!res.ok) throw new Error('Failed to update status');
+    if (!res.ok) throw new Error(await readErrorMessage(res, 'Failed to update status'));
     return res.json();
 }
 
@@ -328,7 +337,7 @@ async function loadTasks() {
         renderPagination(data);
         loadStats();
     } catch (err) {
-        showToast('Failed to load tasks', 'error');
+        showToast(err.message || 'Failed to load tasks', 'error');
     }
 }
 
