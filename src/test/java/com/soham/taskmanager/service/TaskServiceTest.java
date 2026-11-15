@@ -47,6 +47,7 @@ class TaskServiceTest {
     }
 
     private static Task task(Long id, String title) {
+        
         Task t = new Task(title, "desc", Task.Priority.MEDIUM, Task.Status.TODO);
         
         t.setId(id);
@@ -155,6 +156,7 @@ class TaskServiceTest {
         Pageable pageable = PageRequest.of(0, 5);
         Page<Task> page = new PageImpl<>(List.of(task(1L, "a")), pageable, 1);
         when(taskRepository.findWithFilters(null, Task.Priority.HIGH, Task.Category.WORK, null, pageable)).thenReturn(page);
+        
 
         assertSame(page, taskService.getAllTasks(null, Task.Priority.HIGH, Task.Category.WORK, null, pageable));
     }
@@ -165,6 +167,7 @@ class TaskServiceTest {
         Page<Task> page = new PageImpl<>(List.of(), pageable, 0);
         when(taskRepository.findWithFilters(Task.Status.TODO, null, null, "report", pageable)).thenReturn(page);
         when(taskRepository.findWithFilters(Task.Status.TODO, null, null, null, pageable)).thenReturn(page);
+        
 
         assertSame(page, taskService.getAllTasks(Task.Status.TODO, null, null, "  report ", pageable));
         assertSame(page, taskService.getAllTasks(Task.Status.TODO, null, null, "   ", pageable));
@@ -174,6 +177,7 @@ class TaskServiceTest {
     void escapeLikePattern_escapesWildcardsAndEscapeCharacter() {
         assertEquals("100!% done", TaskService.escapeLikePattern("100% done"));
         assertEquals("snake!_case", TaskService.escapeLikePattern("snake_case"));
+        
         assertEquals("wow!!", TaskService.escapeLikePattern("wow!"));
         assertEquals("plain", TaskService.escapeLikePattern("plain"));
     }
@@ -183,6 +187,7 @@ class TaskServiceTest {
         when(taskRepository.count()).thenReturn(10L);
         when(taskRepository.countByStatus(Task.Status.TODO)).thenReturn(4L);
         when(taskRepository.countByStatus(Task.Status.IN_PROGRESS)).thenReturn(3L);
+        
         when(taskRepository.countByStatus(Task.Status.DONE)).thenReturn(3L);
         when(taskRepository.countOverdueTasks(any(LocalDate.class))).thenReturn(2L);
 
