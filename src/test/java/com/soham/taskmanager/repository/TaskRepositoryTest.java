@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class TaskRepositoryTest {
 
     private static final PageRequest FIRST_PAGE = PageRequest.of(0, 20, Sort.by("title"));
+    
 
     @Autowired
     private TaskRepository taskRepository;
@@ -33,6 +35,7 @@ class TaskRepositoryTest {
         save("Write report", Task.Priority.HIGH, Task.Status.TODO, Task.Category.WORK, today.minusDays(2));
         save("Review report", Task.Priority.LOW, Task.Status.DONE, Task.Category.WORK, today.minusDays(5));
         save("Gym session", Task.Priority.MEDIUM, Task.Status.IN_PROGRESS, Task.Category.PERSONAL, today);
+        
         save("Pay rent", Task.Priority.HIGH, Task.Status.TODO, Task.Category.FINANCE, null);
     }
 
@@ -43,6 +46,7 @@ class TaskRepositoryTest {
     @Test
     void findWithFilters_withAllNulls_returnsEverything() {
         Page<Task> page = taskRepository.findWithFilters(null, null, null, null, FIRST_PAGE);
+        
         assertEquals(4, page.getTotalElements());
     }
 
