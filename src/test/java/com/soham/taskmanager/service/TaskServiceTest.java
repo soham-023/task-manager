@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +37,7 @@ class TaskServiceTest {
 
     @Mock
     private TaskRepository taskRepository;
+    
 
     private TaskService taskService;
 
@@ -46,6 +48,7 @@ class TaskServiceTest {
 
     private static Task task(Long id, String title) {
         Task t = new Task(title, "desc", Task.Priority.MEDIUM, Task.Status.TODO);
+        
         t.setId(id);
         return t;
     }
@@ -79,6 +82,7 @@ class TaskServiceTest {
         when(taskRepository.findById(42L)).thenReturn(Optional.empty());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
+                                                    
                 () -> taskService.getTaskById(42L));
         assertEquals("Task not found with id: 42", ex.getMessage());
     }
