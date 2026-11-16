@@ -13,8 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.util.Set;
 
 /**
@@ -34,8 +32,6 @@ public class TaskController {
     static final int MAX_PAGE_SIZE = 100;
 
     private final TaskService taskService;
-    
-
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
         
@@ -56,7 +52,9 @@ public class TaskController {
      *   - sortDir:  asc | desc (default "desc")
      */
     @GetMapping
+    
     public ResponseEntity<Page<Task>> getAllTasks(
+        
             @RequestParam(required = false) Task.Status status,
             @RequestParam(required = false) Task.Priority priority,
         
@@ -80,6 +78,7 @@ public class TaskController {
         }
         if (size < 1 || size > MAX_PAGE_SIZE) {
             throw new IllegalArgumentException("size must be between 1 and " + MAX_PAGE_SIZE);
+            
         }
 
         Sort sort = sortDir.equalsIgnoreCase("asc")
@@ -88,7 +87,6 @@ public class TaskController {
         
         Pageable pageable = PageRequest.of(page, size, sort);
         
-
         Page<Task> tasks = taskService.getAllTasks(status, priority, category, search, pageable);
         return ResponseEntity.ok(tasks);
     }
@@ -100,6 +98,7 @@ public class TaskController {
     @GetMapping("/stats")
     public ResponseEntity<TaskStats> getTaskStats() {
         return ResponseEntity.ok(taskService.getTaskStats());
+        
     }
 
     /**
