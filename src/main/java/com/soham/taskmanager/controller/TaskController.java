@@ -93,9 +93,10 @@ public class TaskController {
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<Task> tasks = taskService.getAllTasks(status, priority, category, search, pageable);
+        
         return ResponseEntity.ok(tasks);
     }
-
+//// get
     /**
      * GET /api/tasks/stats
      * Return aggregate task counts (total, todo, inProgress, done, overdue) for the dashboard.
