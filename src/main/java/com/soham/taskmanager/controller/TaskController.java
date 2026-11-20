@@ -3,6 +3,7 @@ package com.soham.taskmanager.controller;
 import com.soham.taskmanager.dto.StatusUpdateRequest;
 import com.soham.taskmanager.dto.TaskStats;
 import com.soham.taskmanager.model.Task;
+
 import com.soham.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,7 @@ public class TaskController {
 
     private final TaskService taskService;
     public TaskController(TaskService taskService) {
+        
         this.taskService = taskService;
         
     }
@@ -62,6 +64,7 @@ public class TaskController {
         
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
+        
             @RequestParam(defaultValue = "6") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
@@ -72,6 +75,7 @@ public class TaskController {
         }
         if (!sortDir.equalsIgnoreCase("asc") && !sortDir.equalsIgnoreCase("desc")) {
             throw new IllegalArgumentException("Invalid sortDir: " + sortDir + ". Must be asc or desc");
+            
         }
         if (page < 0) {
             throw new IllegalArgumentException("page must be 0 or greater");
@@ -84,6 +88,7 @@ public class TaskController {
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
+        
         
         Pageable pageable = PageRequest.of(page, size, sort);
         
@@ -107,6 +112,7 @@ public class TaskController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+        
         
         Task task = taskService.getTaskById(id);
         return ResponseEntity.ok(task);
