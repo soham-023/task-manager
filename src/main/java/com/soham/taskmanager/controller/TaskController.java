@@ -70,6 +70,7 @@ public class TaskController {
             @RequestParam(defaultValue = "6") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
         
+        
             @RequestParam(defaultValue = "desc") String sortDir) {
 
         if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
@@ -82,6 +83,7 @@ public class TaskController {
         }
         if (page < 0) {
             throw new IllegalArgumentException("page must be 0 or greater");
+            
         }
         if (size < 1 || size > MAX_PAGE_SIZE) {
             throw new IllegalArgumentException("size must be between 1 and " + MAX_PAGE_SIZE);
@@ -90,6 +92,7 @@ public class TaskController {
 
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
+            
                 : Sort.by(sortBy).descending();
         
         
@@ -106,7 +109,6 @@ public class TaskController {
      */
     @GetMapping("/stats")
     public ResponseEntity<TaskStats> getTaskStats() {
-        
         return ResponseEntity.ok(taskService.getTaskStats());
         
     }
