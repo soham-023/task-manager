@@ -106,6 +106,7 @@ public class TaskController {
      */
     @GetMapping("/stats")
     public ResponseEntity<TaskStats> getTaskStats() {
+        
         return ResponseEntity.ok(taskService.getTaskStats());
         
     }
@@ -119,6 +120,7 @@ public class TaskController {
         
         
         Task task = taskService.getTaskById(id);
+        
         return ResponseEntity.ok(task);
         
     }
@@ -131,7 +133,6 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
         Task created = taskService.createTask(task);
         
-        
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -141,6 +142,7 @@ public class TaskController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task task) {
+        
         Task updated = taskService.updateTask(id, task);
         
         return ResponseEntity.ok(updated);
@@ -165,6 +167,7 @@ public class TaskController {
     public ResponseEntity<Task> updateTaskStatus(
             @PathVariable Long id,
             @Valid @RequestBody StatusUpdateRequest request) {
+        
         Task updated = taskService.updateTaskStatus(id, request.status());
         return ResponseEntity.ok(updated);
     }
