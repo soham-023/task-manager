@@ -28,6 +28,7 @@ public class TaskController {
     /** Fields clients are allowed to sort by; anything else is rejected with 400. */
     static final Set<String> ALLOWED_SORT_FIELDS =
             Set.of("createdAt", "updatedAt", "dueDate", "priority", "status", "title");
+    
 
     /** Upper bound on page size to keep responses small. */
     static final int MAX_PAGE_SIZE = 100;
@@ -60,6 +61,7 @@ public class TaskController {
             @RequestParam(required = false) Task.Status status,
             @RequestParam(required = false) Task.Priority priority,
         
+        
             @RequestParam(required = false) Task.Category category,
         
             @RequestParam(required = false) String search,
@@ -67,6 +69,7 @@ public class TaskController {
         
             @RequestParam(defaultValue = "6") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
+        
             @RequestParam(defaultValue = "desc") String sortDir) {
 
         if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
