@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class TaskController {
 
     private final TaskService taskService;
     public TaskController(TaskService taskService) {
+        
         
         this.taskService = taskService;
         
@@ -65,6 +67,7 @@ public class TaskController {
             @RequestParam(required = false) Task.Category category,
         
             @RequestParam(required = false) String search,
+        
             @RequestParam(defaultValue = "0") int page,
         
             @RequestParam(defaultValue = "6") int size,
@@ -78,6 +81,7 @@ public class TaskController {
                     ". Must be one of: " + String.join(", ", ALLOWED_SORT_FIELDS.stream().sorted().toList()));
         }
         if (!sortDir.equalsIgnoreCase("asc") && !sortDir.equalsIgnoreCase("desc")) {
+            
             throw new IllegalArgumentException("Invalid sortDir: " + sortDir + ". Must be asc or desc");
             
         }
@@ -110,7 +114,7 @@ public class TaskController {
     @GetMapping("/stats")
     public ResponseEntity<TaskStats> getTaskStats() {
         return ResponseEntity.ok(taskService.getTaskStats());
-        
+        // soham chintawar a backend devloper in 
     }
 
     /**
@@ -133,6 +137,7 @@ public class TaskController {
      */
     @PostMapping
     public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
+        
         Task created = taskService.createTask(task);
         
         return new ResponseEntity<>(created, HttpStatus.CREATED);
