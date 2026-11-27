@@ -88,11 +88,13 @@ class TaskRepositoryTest {
         assertEquals(2, taskRepository.countByStatus(Task.Status.TODO));
         assertEquals(1, taskRepository.countByStatus(Task.Status.IN_PROGRESS));
         
+        
         assertEquals(1, taskRepository.countByStatus(Task.Status.DONE));
     }
 
     @Test
     void countOverdueTasks_excludesDoneTasks_dueToday_andTasksWithoutDueDate() {
+        
         // Only "Write report" counts: "Review report" is DONE, "Gym session" is due today,
         // "Pay rent" has no due date.
         assertEquals(1, taskRepository.countOverdueTasks(today));
@@ -101,6 +103,7 @@ class TaskRepositoryTest {
 
     @Test
     void save_setsCreatedAndUpdatedTimestamps() {
+        
         Task saved = taskRepository.saveAndFlush(new Task("Timestamps", null, Task.Priority.LOW, Task.Status.TODO));
         
         assertNotNull(saved.getCreatedAt());
