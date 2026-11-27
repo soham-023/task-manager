@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ class TaskControllerTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
+    
     void setUp() {
         taskRepository.deleteAll();
         
@@ -48,6 +50,7 @@ class TaskControllerTest {
     // --- Helper ---
     
     private Task createSampleTask(String title, Task.Priority priority, Task.Status status) {
+        
         Task task = new Task(title, "Description for " + title, priority, status);
         
         return taskRepository.save(task);
