@@ -4,6 +4,7 @@ import com.soham.taskmanager.model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,7 @@ class TaskRepositoryTest {
     @BeforeEach
     void seed() {
         save("Write report", Task.Priority.HIGH, Task.Status.TODO, Task.Category.WORK, today.minusDays(2));
+        
         save("Review report", Task.Priority.LOW, Task.Status.DONE, Task.Category.WORK, today.minusDays(5));
         save("Gym session", Task.Priority.MEDIUM, Task.Status.IN_PROGRESS, Task.Category.PERSONAL, today);
         
@@ -41,6 +43,7 @@ class TaskRepositoryTest {
 
     private void save(String title, Task.Priority priority, Task.Status status, Task.Category category, LocalDate due) {
         taskRepository.save(new Task(title, null, priority, status, due, category));
+        
     }
 
     @Test
@@ -56,6 +59,7 @@ class TaskRepositoryTest {
                 Task.Status.TODO, Task.Priority.HIGH, Task.Category.WORK, null, FIRST_PAGE);
 
         assertEquals(1, page.getTotalElements());
+        
         assertEquals("Write report", page.getContent().get(0).getTitle());
     }
 
@@ -65,6 +69,7 @@ class TaskRepositoryTest {
 
         assertEquals(2, page.getTotalElements());
         assertEquals("Review report", page.getContent().get(0).getTitle());
+        
         assertEquals("Write report", page.getContent().get(1).getTitle());
     }
 
