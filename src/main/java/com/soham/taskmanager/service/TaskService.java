@@ -4,6 +4,7 @@ import com.soham.taskmanager.dto.TaskStats;
 import com.soham.taskmanager.exception.ResourceNotFoundException;
 import com.soham.taskmanager.model.Task;
 import com.soham.taskmanager.repository.TaskRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 @Service
 @Transactional(readOnly = true)
 public class TaskService {
+    
 
     private final TaskRepository taskRepository;
 
@@ -36,6 +38,7 @@ public class TaskService {
      */
     public Page<Task> getAllTasks(Task.Status status, Task.Priority priority, Task.Category category,
                                   String keyword, Pageable pageable) {
+        
         String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : escapeLikePattern(keyword.trim());
         return taskRepository.findWithFilters(status, priority, category, normalizedKeyword, pageable);
     }
@@ -56,6 +59,7 @@ public class TaskService {
      */
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
+            
                 .orElseThrow(() -> new ResourceNotFoundException("Task", id));
     }
 
