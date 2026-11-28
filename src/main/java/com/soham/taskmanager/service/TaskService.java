@@ -88,6 +88,7 @@ public class TaskService {
         Task existing = getTaskById(id);
         existing.setTitle(updatedTask.getTitle());
         existing.setDescription(updatedTask.getDescription());
+        
         existing.setPriority(updatedTask.getPriority());
         existing.setStatus(updatedTask.getStatus());
         existing.setDueDate(updatedTask.getDueDate());
@@ -103,6 +104,7 @@ public class TaskService {
     @Transactional
     public void deleteTask(Long id) {
         Task existing = getTaskById(id);
+        
         taskRepository.delete(existing);
     }
 
@@ -114,6 +116,7 @@ public class TaskService {
     @Transactional
     public Task updateTaskStatus(Long id, Task.Status status) {
         Task existing = getTaskById(id);
+        
         existing.setStatus(status);
         return taskRepository.save(existing);
         
@@ -126,6 +129,7 @@ public class TaskService {
         return new TaskStats(
                 taskRepository.count(),
                 taskRepository.countByStatus(Task.Status.TODO),
+            
                 taskRepository.countByStatus(Task.Status.IN_PROGRESS),
                 taskRepository.countByStatus(Task.Status.DONE),
                 taskRepository.countOverdueTasks(LocalDate.now()));
